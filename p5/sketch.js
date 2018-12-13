@@ -29,7 +29,7 @@ class Sphere {
     this.dy = dy;
     this.color = color;
     this.g = g;
-		this.mass = mass;
+    this.mass = mass;
     this.isCollide = false;
   }
 
@@ -56,11 +56,11 @@ class Sphere {
   }
 
   //bounces ball off the surface
-	suddenChangeInAttitude(){
-		if(this.y > windowHeight - 30 - this.radius){
-			this.dy = this.dy * -1;
-		}
-	}
+  suddenChangeInAttitude(){
+    if(this.y > windowHeight - 30 - this.radius){
+      this.dy = this.dy * -1;
+    }
+  }
 
   //checks for collisions with other spheres
   collision(otherSphere){
@@ -73,6 +73,13 @@ class Sphere {
       this.dy = otherSphere.dy;
       otherSphere.dx = tempDx;
       otherSphere.dy = tempDy;
+    }
+  }
+
+  //this isnt working
+  wallCollision(){
+    if(this.y + radius >= wall.y && this.x + radius > wall.x && this.x - radius < wall.x + wall.width){
+      this.y = 0;
     }
   }
 }
@@ -157,9 +164,10 @@ function stateDiety(){
         }
       }
       objectArray[i].show();
-    	objectArray[i].update();
-    	objectArray[i].surfaceGravity();
-			objectArray[i].suddenChangeInAttitude();
+      objectArray[i].update();
+      objectArray[i].surfaceGravity();
+      objectArray[i].suddenChangeInAttitude();
+      objectArray[i].wallCollision();//fix
     }
   }
   else if(state === "altitude"){
@@ -177,6 +185,7 @@ function stateDiety(){
       objectArray[f].show();
       objectArray[f].update();
       objectArray[f].altitudeGravity();
+      objectArray[f].wallCollision(); // fix
     }
   }
   else if(state === 2){
