@@ -76,10 +76,12 @@ class Sphere {
     }
   }
 
-  //this isnt working
-  wallCollision(){
-    if(this.y + radius >= wall.y && this.x + radius > wall.x && this.x - radius < wall.x + wall.width){
-      this.y = 0;
+  //collide with wall
+  wallCollision(wall){
+    if(this.y + this.radius >= wall.y && this.y + this.radius <= wall.y + wall.height && this.x + this.radius > wall.x && this.x - this.radius < wall.x + wall.width){
+      let tempVar = this.dy;
+      tempVar = tempVar - tempVar / 5;
+      this.dy = 0 - tempVar;
     }
   }
 }
@@ -105,23 +107,80 @@ function setup() {
 }
 
 function mousePressed(){
-  if(g === 9.806){
-    wall = new Wall(mouseX,mouseY,100,20,determineColor());
-    staticObjectArray.push(wall);
+  if(keyIsDown(49) && state === "surface" || state === "altitude"){
+    sphere = new Sphere(mouseX, mouseY, 15, -8, 0, determineColor(), g, 10);
+    objectArray.push(sphere);
+  }
+  else if(keyIsDown(50) && state === "surface" || state === "altitude"){
+    sphere = new Sphere(mouseX, mouseY, 15, -6, 0, determineColor(), g, 10);
+    objectArray.push(sphere);
+  }
+  else if(keyIsDown(51) && state === "surface" || state === "altitude"){
+    sphere = new Sphere(mouseX, mouseY, 15, -4, 0, determineColor(), g, 10);
+    objectArray.push(sphere);
+  }
+  else if(keyIsDown(52) && state === "surface" || state === "altitude"){
+    sphere = new Sphere(mouseX, mouseY, 15, -2, 0, determineColor(), g, 10);
+    objectArray.push(sphere);
+  }
+  else if(keyIsDown(53) && state === "surface" || state === "altitude"){
+    spawnBall();
+  }
+  else if(keyIsDown(54) && state === "surface" || state === "altitude"){
+    sphere = new Sphere(mouseX, mouseY, 15, 2, 0, determineColor(), g, 10);
+    objectArray.push(sphere);
+  }
+  else if(keyIsDown(55) && state === "surface" || state === "altitude"){
+    sphere = new Sphere(mouseX, mouseY, 15, 4, 0, determineColor(), g, 10);
+    objectArray.push(sphere);
+  }
+  else if(keyIsDown(56) && state === "surface" || state === "altitude"){
+    sphere = new Sphere(mouseX, mouseY, 15, 6, 0, determineColor(), g, 10);
+    objectArray.push(sphere);
+  }
+  else if(keyIsDown(57) && state === "surface" || state === "altitude"){
+    sphere = new Sphere(mouseX, mouseY, 15, 8, 0, determineColor(), g, 10);
+    objectArray.push(sphere);
   }
   else if(state === "surface" || state === "altitude"){
-    sphere = new Sphere(mouseX,mouseY,15,0,0,determineColor(), g, 10);
-    objectArray.push(sphere);
+    spawnBall();
   }
 }
 
-//determines ball color based of variable(make a better system than this)
+function spawnBall(){
+  sphere = new Sphere(mouseX, mouseY, 15, 0, 0, determineColor(), g, 10);
+  objectArray.push(sphere);
+}
+
+function keyPressed(){
+  if(keyIsDown(87)){
+    wall = new Wall(mouseX,mouseY,100,20,determineColor());
+    staticObjectArray.push(wall);
+  }
+}
+
+//determines object color based off of variable
 function determineColor(){
   if(colorState === 0){
-    return color(100,100,100,255);
+    return color(100,100,100,255);//grey
+  }
+  else if(colorState === 1){
+    return color(255,255,255,255);
+  }
+  else if(colorState === 2){
+    return color(255,0,0,255);
+  }
+  else if(colorState === 3){
+    return color(0,255,0,255);
+  }
+  else if(colorState === 4){
+    return color(0,0,255,255);
+  }
+  else if(colorState === 5){
+    return color(0);
   }
   else{
-    return color(100,100,100,255);
+    return color(100,100,100,255);//makes the game grey if user tries to mess with the color state variable
   }
 }
 
@@ -154,6 +213,9 @@ function stateDiety(){
     showSurface();
     for(let r = 0; r < staticObjectArray.length; r++){
       staticObjectArray[r].show();
+      for(let e = 0; e < objectArray.length; e++){
+        objectArray[e].wallCollision(staticObjectArray[r]);
+      }
     }
     for (let i=objectArray.length-1; i >= 0; i--){
       objectArray[i].isCollide = false;
@@ -167,13 +229,15 @@ function stateDiety(){
       objectArray[i].update();
       objectArray[i].surfaceGravity();
       objectArray[i].suddenChangeInAttitude();
-      objectArray[i].wallCollision();//fix
     }
   }
   else if(state === "altitude"){
     background(0,255,255,255);
     for(let r = 0; r < staticObjectArray.length; r++){
       staticObjectArray[r].show();
+      for(let e = 0; e < objectArray.length; e++){
+        objectArray[e].wallCollision(staticObjectArray[r]);
+      }
     }
     for(let f=objectArray.length-1; f>=0; f--){
       objectArray[f].isCollide = false;
@@ -185,7 +249,6 @@ function stateDiety(){
       objectArray[f].show();
       objectArray[f].update();
       objectArray[f].altitudeGravity();
-      objectArray[f].wallCollision(); // fix
     }
   }
   else if(state === 2){
