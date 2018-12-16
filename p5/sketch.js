@@ -58,7 +58,8 @@ class Sphere {
   //bounces ball off the surface
   suddenChangeInAttitude(){
     if(this.y > windowHeight - 30 - this.radius){
-      this.dy = this.dy * -1;
+      this.dy = this.dy - percentEnergyLoss/100;
+      this.dy = 0 - this.dy;
     }
   }
 
@@ -69,8 +70,11 @@ class Sphere {
       otherSphere.isCollide = true;
       let tempDx = this.dx;
       let tempDy = this.dy;
-      this.dx = otherSphere.dx;
-      this.dy = otherSphere.dy;
+      //let randomX = random()
+      tempDx = tempDx - (0.25 * percentEnergyLoss)/100;
+      tempDy = tempDy - (0.25 * percentEnergyLoss)/100;
+      this.dx = otherSphere.dx - (0.25 * percentEnergyLoss)/100;
+      this.dy = otherSphere.dy - (0.25 * percentEnergyLoss)/100;
       otherSphere.dx = tempDx;
       otherSphere.dy = tempDy;
     }
@@ -80,7 +84,12 @@ class Sphere {
   wallCollision(wall){
     if(this.y + this.radius >= wall.y && this.y + this.radius <= wall.y + wall.height && this.x + this.radius > wall.x && this.x - this.radius < wall.x + wall.width){
       let tempVar = this.dy;
-      tempVar = tempVar - tempVar / 5;
+      tempVar = tempVar - percentEnergyLoss/100;
+      this.dy = 0 - tempVar;
+    }
+    else if(this.y - this.radius <= wall.y + wall.height && this.y - this.radius >= wall.y && this.x + this.radius > wall.x && this.x - this.radius < wall.x + wall.width){
+      let tempVar = this.dy;
+      tempVar = tempVar - percentEnergyLoss/100;
       this.dy = 0 - tempVar;
     }
   }
@@ -97,12 +106,14 @@ let staticObjectArray = [];
 let state;
 let planet;
 let colorState;
+let percentEnergyLoss;
 
 function setup() {
   g = 9.81;
   colorState = 0;
   state = "surface";
   planet = "Earth";
+  percentEnergyLoss = 10;//for some unbeknowns't to me reason 10 seems to simulate fully elastic collisions
   createCanvas(windowWidth, windowHeight);
 }
 
@@ -152,10 +163,34 @@ function spawnBall(){
   objectArray.push(sphere);
 }
 
+//remake - this is shit
+function explosive(){
+  let bomb;
+  bomb = new Sphere(mouseX+20,mouseY,10,10,0,determineColor(),g,5);
+  objectArray.push(bomb);
+  bomb = new Sphere(mouseX-20,mouseY,10,-10,0,determineColor(),g,5);
+  objectArray.push(bomb);
+  bomb = new Sphere(mouseX,mouseY-20,10,0,-10,determineColor(),0,5);
+  objectArray.push(bomb);
+  bomb = new Sphere(mouseX,mouseY+20,10,0,10,determineColor(),g,5);
+  objectArray.push(bomb);
+  bomb = new Sphere(mouseX+20,mouseY+20,10,6,7,determineColor(),g,5);
+  objectArray.push(bomb);
+  bomb = new Sphere(mouseX-20,mouseY-20,10,4,-7,determineColor(),g,5);
+  objectArray.push(bomb);
+  bomb = new Sphere(mouseX-20,mouseY-20,10,-6,-5,determineColor(),0,5);
+  objectArray.push(bomb);
+  bomb = new Sphere(mouseX-20,mouseY+20,10,-6,6,determineColor(),g,5);
+  objectArray.push(bomb);
+}
+
 function keyPressed(){
   if(keyIsDown(87)){
     wall = new Wall(mouseX,mouseY,100,20,determineColor());
     staticObjectArray.push(wall);
+  }
+  if(keyIsDown(32)){
+    explosive();
   }
 }
 
