@@ -58,7 +58,7 @@ class Sphere {
   //bounces ball off the surface
   suddenChangeInAttitude(){
     if(this.y > windowHeight - 30 - this.radius){
-      this.dy = this.dy - percentEnergyLoss/100;
+      this.dy = this.dy - energyLoss/100;
       this.dy = 0 - this.dy;
     }
   }
@@ -66,32 +66,130 @@ class Sphere {
   //checks for collisions with other spheres
   collision(otherSphere){
     if(dist(this.x,this.y,otherSphere.x,otherSphere.y) < this.radius + otherSphere.radius){
-      this.isCollide = true;
-      otherSphere.isCollide = true;
-      let tempDx = this.dx;
-      let tempDy = this.dy;
-      //let randomX = random()
-      tempDx = tempDx - (0.25 * percentEnergyLoss)/100;
-      tempDy = tempDy - (0.25 * percentEnergyLoss)/100;
-      this.dx = otherSphere.dx - (0.25 * percentEnergyLoss)/100;
-      this.dy = otherSphere.dy - (0.25 * percentEnergyLoss)/100;
-      otherSphere.dx = tempDx;
-      otherSphere.dy = tempDy;
+      if(this.x < otherSphere.x + 3 && this.x > otherSphere.x - 3 || this.y < otherSphere.y + 3 && this.y > otherSphere.y - 3){
+        this.isCollide = true;
+        otherSphere.isCollide = true;
+        let tempDx = this.dx;
+        let tempDy = this.dy;
+        this.dx = otherSphere.dx;
+        this.dy = otherSphere.dy;
+        otherSphere.dx = tempDx;
+        otherSphere.dy = tempDy;
+      }
+      else{
+        if(this.x < otherSphere.x && this.y < otherSphere.y){
+          //
+          totalSpeed = abs(this.dx) + abs(this.dy) + abs(otherSphere.dx) + abs(otherSphere.dy);
+          quarterSpeed = totalSpeed / 4;
+          addThisX = 0 - quarterSpeed + (0.25*energyLoss/100);
+          addThisY = 0 - quarterSpeed + (0.25*energyLoss/100);
+          addOtherX = quarterSpeed - (0.25*energyLoss/100);
+          addOtherY = quarterSpeed - (0.25*energyLoss/100);
+        }
+        else if(this.x > otherSphere.x && this.y < otherSphere.y){
+          //
+          totalSpeed = abs(this.dx) + abs(this.dy) + abs(otherSphere.dx) + abs(otherSphere.dy);
+          quarterSpeed = totalSpeed / 4;
+          addThisX = quarterSpeed - (0.25*energyLoss/100);
+          addThisY = 0 - quarterSpeed + (0.25*energyLoss/100);
+          addOtherX = 0 - quarterSpeed + (0.25*energyLoss/100);
+          addOtherY = quarterSpeed - (0.25*energyLoss/100);
+        }
+        else if(this.x > otherSphere.x && this.y > otherSphere.y){
+          //
+          totalSpeed = abs(this.dx) + abs(this.dy) + abs(otherSphere.dx) + abs(otherSphere.dy);
+          quarterSpeed = totalSpeed / 4;
+          addThisX = quarterSpeed - (0.25*energyLoss/100);
+          addThisY = quarterSpeed - (0.25*energyLoss/100);
+          addOtherX = 0 - quarterSpeed + (0.25*energyLoss/100);
+          addOtherY = 0 - quarterSpeed + (0.25*energyLoss/100);
+        }
+        else if(this.x < otherSphere.x && this.y > otherSphere.y){
+          //
+          totalSpeed = abs(this.dx) + abs(this.dy) + abs(otherSphere.dx) + abs(otherSphere.dy);
+          quarterSpeed = totalSpeed / 4;
+          addThisX = 0 - quarterSpeed + (0.25*energyLoss/100);
+          addThisY = quarterSpeed - (0.25*energyLoss/100);
+          addOtherX = quarterSpeed - (0.25*energyLoss/100);
+          addOtherY = 0 - quarterSpeed + (0.25*energyLoss/100);
+        }
+        this.isCollide = true;
+        otherSphere.isCollide = true;
+        let tempDx = this.dx / 2;
+        let tempDy = this.dy / 2;
+        let tempOtherDx = otherSphere.dy / 2;
+        let tempOtherDy = otherSphere.dy / 2;
+        this.dx = tempOtherDx + addThisX;
+        this.dy = tempOtherDy + addThisY;
+        otherSphere.dx = tempDx + addOtherX ;
+        otherSphere.dy = tempDy + addOtherY;
+      }
     }
+  }
+
+  checkMouse(){
+      if(mouseX > this.x - this.radius  && mouseX < this.x + this.radius && mouseY < this.y + this.radius && mouseY > this.y - this.radius){
+        return true;
+      }
+      else{
+        return false;
+      }
+  }
+
+  dragObject(){
+      this.x = mouseX;
+      this.y = mouseY;
   }
 
   //collide with wall
   wallCollision(wall){
     if(this.y + this.radius >= wall.y && this.y + this.radius <= wall.y + wall.height && this.x + this.radius > wall.x && this.x - this.radius < wall.x + wall.width){
-      let tempVar = this.dy;
-      tempVar = tempVar - percentEnergyLoss/100;
-      this.dy = 0 - tempVar;
+      if(this.x > wall.x + wall.width + 5){//if ball lands on right corner of wall(FIX)
+        //
+        let tempVar = this.dy / 2;
+        tempVar = tempVar - energyLoss/100;
+        this.dx = tempVar;
+        this.dy = 0 - tempVar;
+
+      }
+      else if(this.x < wall.x - 5){ // if ball lands on left corner of wall(FIX)
+        let tempVar = this.dy / 2;
+        tempVar = tempVar - energyLoss/100;
+        this.dx = 0 - tempVar;
+        this.dy = 0 - tempVar;
+      }
+      else{
+        let tempVar = this.dy;
+        tempVar = tempVar - energyLoss/100;
+        this.dy = 0 - tempVar;
+      }
     }
     else if(this.y - this.radius <= wall.y + wall.height && this.y - this.radius >= wall.y && this.x + this.radius > wall.x && this.x - this.radius < wall.x + wall.width){
       let tempVar = this.dy;
-      tempVar = tempVar - percentEnergyLoss/100;
+      tempVar = tempVar - energyLoss/100;
       this.dy = 0 - tempVar;
     }
+  }
+}
+
+class Timer {
+  constructor(waitTime) {
+    this.beginTime = millis();
+    this.length = waitTime;
+  }
+
+  isDone() {
+    if (millis() >= this.beginTime + this.length) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  reset(waitTime) {
+    this.beginTime = millis();
+    this.length = waitTime;
   }
 }
 
@@ -106,58 +204,116 @@ let staticObjectArray = [];
 let state;
 let planet;
 let colorState;
-let percentEnergyLoss;
+let energyLoss;
+let allowed;
+let addThisX, addThisY, addOtherX, addOtherY;
+let totalSpeed, quarterSpeed;
 
 function setup() {
   g = 9.81;
   colorState = 0;
   state = "surface";
   planet = "Earth";
-  percentEnergyLoss = 10;//for some unbeknowns't to me reason 10 seems to simulate fully elastic collisions
+  allowed = true;
+  energyLoss = 10;//for some unbeknowns't to me reason 10 seems to simulate fully elastic collisions
   createCanvas(windowWidth, windowHeight);
 }
 
-function mousePressed(){
-  if(keyIsDown(49) && state === "surface" || state === "altitude"){
-    sphere = new Sphere(mouseX, mouseY, 15, -8, 0, determineColor(), g, 10);
-    objectArray.push(sphere);
-  }
-  else if(keyIsDown(50) && state === "surface" || state === "altitude"){
-    sphere = new Sphere(mouseX, mouseY, 15, -6, 0, determineColor(), g, 10);
-    objectArray.push(sphere);
-  }
-  else if(keyIsDown(51) && state === "surface" || state === "altitude"){
-    sphere = new Sphere(mouseX, mouseY, 15, -4, 0, determineColor(), g, 10);
-    objectArray.push(sphere);
-  }
-  else if(keyIsDown(52) && state === "surface" || state === "altitude"){
-    sphere = new Sphere(mouseX, mouseY, 15, -2, 0, determineColor(), g, 10);
-    objectArray.push(sphere);
-  }
-  else if(keyIsDown(53) && state === "surface" || state === "altitude"){
-    spawnBall();
-  }
-  else if(keyIsDown(54) && state === "surface" || state === "altitude"){
-    sphere = new Sphere(mouseX, mouseY, 15, 2, 0, determineColor(), g, 10);
-    objectArray.push(sphere);
-  }
-  else if(keyIsDown(55) && state === "surface" || state === "altitude"){
-    sphere = new Sphere(mouseX, mouseY, 15, 4, 0, determineColor(), g, 10);
-    objectArray.push(sphere);
-  }
-  else if(keyIsDown(56) && state === "surface" || state === "altitude"){
-    sphere = new Sphere(mouseX, mouseY, 15, 6, 0, determineColor(), g, 10);
-    objectArray.push(sphere);
-  }
-  else if(keyIsDown(57) && state === "surface" || state === "altitude"){
-    sphere = new Sphere(mouseX, mouseY, 15, 8, 0, determineColor(), g, 10);
-    objectArray.push(sphere);
-  }
-  else if(state === "surface" || state === "altitude"){
-    spawnBall();
+//checks if there is room to add a ball where the mouse is
+function checkIfRoom(){
+  for(let c = 0; c < objectArray.length; c++){
+    if(objectArray[c].checkMouse() === true){
+      objectArray[c].dragObject();
+      allowed = false;
+    }
+    else if(objectArray[c].checkMouse() === false){
+      allowed = true;
+    }
   }
 }
 
+//called when mouse is pressed
+function mousePressed(){
+  checkIfRoom();
+  if(keyIsDown(49) && state === "surface" || state === "altitude"){
+    checkIfRoom();
+    if(allowed){
+      //creates a ball
+      sphere = new Sphere(mouseX, mouseY, 15, -8, 0, determineColor(), g, 10);
+      objectArray.push(sphere);
+    }
+  }
+  else if(keyIsDown(50) && state === "surface" || state === "altitude"){
+    checkIfRoom();
+    if(allowed){
+      //creates a ball
+      sphere = new Sphere(mouseX, mouseY, 15, -6, 0, determineColor(), g, 10);
+      objectArray.push(sphere);
+    }
+  }
+  else if(keyIsDown(51) && state === "surface" || state === "altitude"){
+    checkIfRoom();
+    if(allowed){
+      //creates a ball
+      sphere = new Sphere(mouseX, mouseY, 15, -4, 0, determineColor(), g, 10);
+      objectArray.push(sphere);
+    }
+  }
+  else if(keyIsDown(52) && state === "surface" || state === "altitude"){
+    checkIfRoom();
+    if(allowed){
+      //creates a ball
+      sphere = new Sphere(mouseX, mouseY, 15, -2, 0, determineColor(), g, 10);
+      objectArray.push(sphere);
+    }
+  }
+  else if(keyIsDown(53) && state === "surface" || state === "altitude"){
+    checkIfRoom();
+    if(allowed){
+      spawnBall();
+    }
+  }
+  else if(keyIsDown(54) && state === "surface" || state === "altitude"){
+    checkIfRoom();
+    if(allowed){
+      //creates a ball
+      sphere = new Sphere(mouseX, mouseY, 15, 2, 0, determineColor(), g, 10);
+      objectArray.push(sphere);
+    }
+  }
+  else if(keyIsDown(55) && state === "surface" || state === "altitude"){
+    checkIfRoom();
+    if(allowed){
+      //creates a ball
+      sphere = new Sphere(mouseX, mouseY, 15, 4, 0, determineColor(), g, 10);
+      objectArray.push(sphere);
+    }
+  }
+  else if(keyIsDown(56) && state === "surface" || state === "altitude"){
+    checkIfRoom();
+    if(allowed){
+      //creates a ball
+      sphere = new Sphere(mouseX, mouseY, 15, 6, 0, determineColor(), g, 10);
+      objectArray.push(sphere);
+    }
+  }
+  else if(keyIsDown(57) && state === "surface" || state === "altitude"){
+    checkIfRoom();
+    if(allowed){
+      //creates a ball
+      sphere = new Sphere(mouseX, mouseY, 15, 8, 0, determineColor(), g, 10);
+      objectArray.push(sphere);
+    }
+  }
+  else if(state === "surface" || state === "altitude"){
+    checkIfRoom();
+    if(allowed){
+      spawnBall();
+    }
+  }
+}
+
+//creates a ball
 function spawnBall(){
   sphere = new Sphere(mouseX, mouseY, 15, 0, 0, determineColor(), g, 10);
   objectArray.push(sphere);
@@ -166,6 +322,8 @@ function spawnBall(){
 //remake - this is shit
 function explosive(){
   let bomb;
+  let tempState = colorState;//sets tempState to colorState to store value
+  colorState = 2; //makes explosion red
   bomb = new Sphere(mouseX+20,mouseY,10,10,0,determineColor(),g,5);
   objectArray.push(bomb);
   bomb = new Sphere(mouseX-20,mouseY,10,-10,0,determineColor(),g,5);
@@ -182,8 +340,10 @@ function explosive(){
   objectArray.push(bomb);
   bomb = new Sphere(mouseX-20,mouseY+20,10,-6,6,determineColor(),g,5);
   objectArray.push(bomb);
+  colorState = tempState;//puts colorState back to normal
 }
 
+//called when key pressed
 function keyPressed(){
   if(keyIsDown(87)){
     wall = new Wall(mouseX,mouseY,100,20,determineColor());
@@ -264,6 +424,13 @@ function stateDiety(){
       objectArray[i].update();
       objectArray[i].surfaceGravity();
       objectArray[i].suddenChangeInAttitude();
+      if(mouseIsPressed){
+        for(let c = 0; c < objectArray.length; c++){
+          if(objectArray[c].checkMouse() === true){
+            objectArray[c].dragObject();
+          }
+        }
+      }
     }
   }
   else if(state === "altitude"){
@@ -284,6 +451,13 @@ function stateDiety(){
       objectArray[f].show();
       objectArray[f].update();
       objectArray[f].altitudeGravity();
+      if(mouseIsPressed){
+        for(let c = 0; c < objectArray.length; c++){
+          if(objectArray[c].checkMouse() === true){
+            objectArray[c].dragObject();//Find a way to make the object stay dragging until mouse released
+          }
+        }
+      }
     }
   }
   else if(state === 2){
