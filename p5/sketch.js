@@ -196,7 +196,7 @@ class Timer {
 let sphere;
 let wall;
 let ballColor;
-let g;
+let g;//gravitational acceleration
 let radius;
 let object;
 let objectArray = [];
