@@ -66,6 +66,8 @@ class Sphere {
   //checks for collisions with other spheres
   collision(otherSphere){
     if(dist(this.x,this.y,otherSphere.x,otherSphere.y) < this.radius + otherSphere.radius){
+      let check = this.dx + this.dy + otherSphere.dx + otherSphere.dy;
+      console.log(str(check));
       if(this.x < otherSphere.x + 3 && this.x > otherSphere.x - 3 || this.y < otherSphere.y + 3 && this.y > otherSphere.y - 3){
         this.isCollide = true;
         otherSphere.isCollide = true;
@@ -81,37 +83,37 @@ class Sphere {
           //
           totalSpeed = abs(this.dx) + abs(this.dy) + abs(otherSphere.dx) + abs(otherSphere.dy);
           quarterSpeed = totalSpeed / 4;
-          addThisX = 0 - quarterSpeed + (0.25*energyLoss/100);
-          addThisY = 0 - quarterSpeed + (0.25*energyLoss/100);
-          addOtherX = quarterSpeed - (0.25*energyLoss/100);
-          addOtherY = quarterSpeed - (0.25*energyLoss/100);
+          addThisX = 0 - quarterSpeed + 0.25*energyLoss/100;
+          addThisY = 0 - quarterSpeed + 0.25*energyLoss/100;
+          addOtherX = quarterSpeed - 0.25*energyLoss/100;
+          addOtherY = quarterSpeed - 0.25*energyLoss/100;
         }
         else if(this.x > otherSphere.x && this.y < otherSphere.y){
           //
           totalSpeed = abs(this.dx) + abs(this.dy) + abs(otherSphere.dx) + abs(otherSphere.dy);
           quarterSpeed = totalSpeed / 4;
-          addThisX = quarterSpeed - (0.25*energyLoss/100);
-          addThisY = 0 - quarterSpeed + (0.25*energyLoss/100);
-          addOtherX = 0 - quarterSpeed + (0.25*energyLoss/100);
-          addOtherY = quarterSpeed - (0.25*energyLoss/100);
+          addThisX = quarterSpeed - 0.25*energyLoss/100;
+          addThisY = 0 - quarterSpeed + 0.25*energyLoss/100;
+          addOtherX = 0 - quarterSpeed + 0.25*energyLoss/100;
+          addOtherY = quarterSpeed - 0.25*energyLoss/100;
         }
         else if(this.x > otherSphere.x && this.y > otherSphere.y){
           //
           totalSpeed = abs(this.dx) + abs(this.dy) + abs(otherSphere.dx) + abs(otherSphere.dy);
           quarterSpeed = totalSpeed / 4;
-          addThisX = quarterSpeed - (0.25*energyLoss/100);
-          addThisY = quarterSpeed - (0.25*energyLoss/100);
-          addOtherX = 0 - quarterSpeed + (0.25*energyLoss/100);
-          addOtherY = 0 - quarterSpeed + (0.25*energyLoss/100);
+          addThisX = quarterSpeed - 0.25*energyLoss/100;
+          addThisY = quarterSpeed - 0.25*energyLoss/100;
+          addOtherX = 0 - quarterSpeed + 0.25*energyLoss/100;
+          addOtherY = 0 - quarterSpeed + 0.25*energyLoss/100;
         }
         else if(this.x < otherSphere.x && this.y > otherSphere.y){
           //
           totalSpeed = abs(this.dx) + abs(this.dy) + abs(otherSphere.dx) + abs(otherSphere.dy);
           quarterSpeed = totalSpeed / 4;
-          addThisX = 0 - quarterSpeed + (0.25*energyLoss/100);
-          addThisY = quarterSpeed - (0.25*energyLoss/100);
-          addOtherX = quarterSpeed - (0.25*energyLoss/100);
-          addOtherY = 0 - quarterSpeed + (0.25*energyLoss/100);
+          addThisX = 0 - quarterSpeed + 0.25*energyLoss/100;
+          addThisY = quarterSpeed - 0.25*energyLoss/100;
+          addOtherX = quarterSpeed - 0.25*energyLoss/100;
+          addOtherY = 0 - quarterSpeed + 0.25*energyLoss/100;
         }
         this.isCollide = true;
         otherSphere.isCollide = true;
@@ -123,46 +125,37 @@ class Sphere {
         this.dy = tempOtherDy + addThisY;
         otherSphere.dx = tempDx + addOtherX ;
         otherSphere.dy = tempDy + addOtherY;
+        let nextCheck = this.dx + this.dy + otherSphere.dx + otherSphere.dy;
+        console.log(str(nextCheck));
       }
     }
   }
 
   checkMouse(){
-      if(mouseX > this.x - this.radius  && mouseX < this.x + this.radius && mouseY < this.y + this.radius && mouseY > this.y - this.radius){
-        return true;
-      }
-      else{
-        return false;
-      }
+    if(mouseX > this.x - this.radius  && mouseX < this.x + this.radius && mouseY < this.y + this.radius && mouseY > this.y - this.radius){
+      return true;
+    }
+    else{
+      return false;
+    }
   }
 
   dragObject(){
-      this.x = mouseX;
-      this.y = mouseY;
+    this.x = mouseX;
+    this.y = mouseY;
   }
 
   //collide with wall
   wallCollision(wall){
-    if(this.y + this.radius >= wall.y && this.y + this.radius <= wall.y + wall.height && this.x + this.radius > wall.x && this.x - this.radius < wall.x + wall.width){
-      if(this.x > wall.x + wall.width + 5){//if ball lands on right corner of wall(FIX)
-        //
-        let tempVar = this.dy / 2;
-        tempVar = tempVar - energyLoss/100;
-        this.dx = tempVar;
-        this.dy = 0 - tempVar;
-
-      }
-      else if(this.x < wall.x - 5){ // if ball lands on left corner of wall(FIX)
-        let tempVar = this.dy / 2;
-        tempVar = tempVar - energyLoss/100;
-        this.dx = 0 - tempVar;
-        this.dy = 0 - tempVar;
-      }
-      else{
-        let tempVar = this.dy;
-        tempVar = tempVar - energyLoss/100;
-        this.dy = 0 - tempVar;
-      }
+    if(this.x + this.radius >= wall.x - wall.width/10 && this.x + this.radius <= wall.x + wall.width/4 && this.y + this.radius >= wall.y && this.y - this.radius*2 <= wall.y){
+      let tempVar = this.dx;
+      tempVar = tempVar - energyLoss/100;
+      this.dx = 0 - tempVar;
+    }
+    else if(this.y + this.radius >= wall.y && this.y + this.radius <= wall.y + wall.height && this.x + this.radius > wall.x && this.x - this.radius < wall.x + wall.width){
+      let tempVar = this.dy;
+      tempVar = tempVar - energyLoss/100;
+      this.dy = 0 - tempVar;
     }
     else if(this.y - this.radius <= wall.y + wall.height && this.y - this.radius >= wall.y && this.x + this.radius > wall.x && this.x - this.radius < wall.x + wall.width){
       let tempVar = this.dy;
@@ -208,6 +201,8 @@ let energyLoss;
 let allowed;
 let addThisX, addThisY, addOtherX, addOtherY;
 let totalSpeed, quarterSpeed;
+let airResistanceY;//coefficient of air resistance
+let airResistanceX;//wind
 
 function setup() {
   g = 9.81;
@@ -215,7 +210,8 @@ function setup() {
   state = "surface";
   planet = "Earth";
   allowed = true;
-  energyLoss = 10;//for some unbeknowns't to me reason 10 seems to simulate fully elastic collisions
+  energyLoss = 20;//for some unbeknowns't to me reason 10 seems to simulate fully elastic collisions
+  airResistanceY =
   createCanvas(windowWidth, windowHeight);
 }
 
@@ -460,7 +456,33 @@ function stateDiety(){
       }
     }
   }
-  else if(state === 2){
+  else if(state === "ocean"){
     //
+    background(0,255,255,255);
+    for(let r = 0; r < staticObjectArray.length; r++){
+      staticObjectArray[r].show();
+      for(let e = 0; e < objectArray.length; e++){
+        objectArray[e].wallCollision(staticObjectArray[r]);
+      }
+    }
+    for(let f = objectArray.length - 1; f >= 0; f--){
+      objectArray[f].isCollide = false;
+      for(let k = objectArray.length - 1; k >= 0; k--){
+        if(f !== k){
+          objectArray[f].collision(objectArray[k]);
+        }
+      }
+      objectArray[f].show();
+      objectArray[f].update();
+      objectArray[f].surfaceGravity();
+      objectArray[f].buoyancy();
+      if(mouseIsPressed){
+        for(let c = 0; c < objectArray.length; c++){
+          if(objectArray[c].checkMouse() === true){
+            objectArray[c].dragObject();
+          }
+        }
+      }
+    }
   }
 }
