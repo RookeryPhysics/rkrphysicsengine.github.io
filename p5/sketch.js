@@ -21,7 +21,7 @@ class Wall{
 }
 
 class Sphere {
-  constructor(x,y,radius,dx,dy,color,g,mass){
+  constructor(x,y,radius,dx,dy,color,g,mass,energyLoss,airResistanceX,airResistanceY){
     this.x = x;
     this.y = y;
     this.radius = radius;
@@ -31,6 +31,9 @@ class Sphere {
     this.g = g;
     this.mass = mass;
     this.isCollide = false;
+    this.energyLoss = energyLoss;
+    this.airX = airResistanceX;
+    this.airY = airResistanceY;
   }
 
   //displays sphere
@@ -58,78 +61,109 @@ class Sphere {
   //bounces ball off the surface
   suddenChangeInAttitude(){
     if(this.y > windowHeight - 30 - this.radius){
-      this.dy = this.dy - energyLoss/100;
+      this.dy = this.dy - this.energyLoss/100;
       this.dy = 0 - this.dy;
+    }
+  }
+
+  airResistance(){
+    if(this.dx > 0){
+      this.dx = this.dx - this.airX/100;
+    }
+    else if(this.dx < 0){
+      this.dx = this.dx + this.airX/100;
     }
   }
 
   //checks for collisions with other spheres
   collision(otherSphere){
     if(dist(this.x,this.y,otherSphere.x,otherSphere.y) < this.radius + otherSphere.radius){
-      let check = this.dx + this.dy + otherSphere.dx + otherSphere.dy;
-      console.log(str(check));
-      if(this.x < otherSphere.x + 3 && this.x > otherSphere.x - 3 || this.y < otherSphere.y + 3 && this.y > otherSphere.y - 3){
+      let massRatioOther = this.mass/otherSphere.mass;
+      let massRatioThis = otherSphere.mass/this.mass;
+      if(this.x < otherSphere.x + otherSphere.radius/5 && this.x > otherSphere.x - otherSphere.radius/5 || this.y < otherSphere.y + otherSphere.radius/5 && this.y > otherSphere.y - otherSphere.radius/5){
         this.isCollide = true;
         otherSphere.isCollide = true;
+        if(this.dx > this.energyLoss/25){
+          this.dx = this.dx - this.energyLoss/25;
+        }
+        else if(this.dx < 0 - this.energyLoss/25){
+          this.dx = this.dx + this.energyLoss/25;
+        }
+        if(this.dy > this.energyLoss/25){
+          this.dy = this.dy - this.energyLoss/25;
+        }
+        else if(this.dy < 0 - this.energyLoss/25){
+          this.dy = this.dy + this.energyLoss/25;
+        }
+        if(otherSphere.dx > this.energyLoss/25){
+          otherSphere.dx = otherSphere.dx - this.energyLoss/25;
+        }
+        else if(otherSphere.dx < 0 - this.energyLoss/25){
+          otherSphere.dx = otherSphere.dx + this.energyLoss/25;
+        }
+        if(otherSphere.dy > this.energyLoss/25){
+          otherSphere.dy = otherSphere.dy - this.energyLoss/25;
+        }
+        else if(otherSphere.dy < 0 - this.energyLoss/25){
+          otherSphere.dy = otherSphere.dy + this.energyLoss/25;
+        }
         let tempDx = this.dx;
         let tempDy = this.dy;
-        this.dx = otherSphere.dx;
-        this.dy = otherSphere.dy;
-        otherSphere.dx = tempDx;
-        otherSphere.dy = tempDy;
+        this.dx = otherSphere.dx * massRatioThis;
+        this.dy = otherSphere.dy * massRatioThis;
+        otherSphere.dx = tempDx * massRatioOther;
+        otherSphere.dy = tempDy * massRatioOther;
       }
       else{
         if(this.x < otherSphere.x && this.y < otherSphere.y){
           //
           totalSpeed = abs(this.dx) + abs(this.dy) + abs(otherSphere.dx) + abs(otherSphere.dy);
           quarterSpeed = totalSpeed / 4;
-          addThisX = 0 - quarterSpeed + 0.25*energyLoss/100;
-          addThisY = 0 - quarterSpeed + 0.25*energyLoss/100;
-          addOtherX = quarterSpeed - 0.25*energyLoss/100;
-          addOtherY = quarterSpeed - 0.25*energyLoss/100;
+          addThisX = 0 - quarterSpeed + this.energyLoss/25;
+          addThisY = 0 - quarterSpeed + this.energyLoss/25;
+          addOtherX = quarterSpeed - this.energyLoss/25;
+          addOtherY = quarterSpeed - this.energyLoss/25;
         }
         else if(this.x > otherSphere.x && this.y < otherSphere.y){
           //
           totalSpeed = abs(this.dx) + abs(this.dy) + abs(otherSphere.dx) + abs(otherSphere.dy);
           quarterSpeed = totalSpeed / 4;
-          addThisX = quarterSpeed - 0.25*energyLoss/100;
-          addThisY = 0 - quarterSpeed + 0.25*energyLoss/100;
-          addOtherX = 0 - quarterSpeed + 0.25*energyLoss/100;
-          addOtherY = quarterSpeed - 0.25*energyLoss/100;
+          addThisX = quarterSpeed - this.energyLoss/25;
+          addThisY = 0 - quarterSpeed + this.energyLoss/25;
+          addOtherX = 0 - quarterSpeed + this.energyLoss/25;
+          addOtherY = quarterSpeed - this.energyLoss/25;
         }
         else if(this.x > otherSphere.x && this.y > otherSphere.y){
           //
           totalSpeed = abs(this.dx) + abs(this.dy) + abs(otherSphere.dx) + abs(otherSphere.dy);
           quarterSpeed = totalSpeed / 4;
-          addThisX = quarterSpeed - 0.25*energyLoss/100;
-          addThisY = quarterSpeed - 0.25*energyLoss/100;
-          addOtherX = 0 - quarterSpeed + 0.25*energyLoss/100;
-          addOtherY = 0 - quarterSpeed + 0.25*energyLoss/100;
+          addThisX = quarterSpeed - this.energyLoss/25;
+          addThisY = quarterSpeed - this.energyLoss/25;
+          addOtherX = 0 - quarterSpeed + this.energyLoss/25;
+          addOtherY = 0 - quarterSpeed + this.energyLoss/25;
         }
         else if(this.x < otherSphere.x && this.y > otherSphere.y){
           //
           totalSpeed = abs(this.dx) + abs(this.dy) + abs(otherSphere.dx) + abs(otherSphere.dy);
           quarterSpeed = totalSpeed / 4;
-          addThisX = 0 - quarterSpeed + 0.25*energyLoss/100;
-          addThisY = quarterSpeed - 0.25*energyLoss/100;
-          addOtherX = quarterSpeed - 0.25*energyLoss/100;
-          addOtherY = 0 - quarterSpeed + 0.25*energyLoss/100;
+          addThisX = 0 - quarterSpeed + this.energyLoss/25;
+          addThisY = quarterSpeed - this.energyLoss/25;
+          addOtherX = quarterSpeed - this.energyLoss/25;
+          addOtherY = 0 - quarterSpeed + this.energyLoss/25;
         }
         this.isCollide = true;
         otherSphere.isCollide = true;
         let tempDx = this.dx / 2;
         let tempDy = this.dy / 2;
-        let tempOtherDx = otherSphere.dy / 2;
+        let tempOtherDx = otherSphere.dx / 2;
         let tempOtherDy = otherSphere.dy / 2;
-        this.dx = tempOtherDx + addThisX;
-        this.dy = tempOtherDy + addThisY;
-        otherSphere.dx = tempDx + addOtherX ;
-        otherSphere.dy = tempDy + addOtherY;
-        let nextCheck = this.dx + this.dy + otherSphere.dx + otherSphere.dy;
-        console.log(str(nextCheck));
+        this.dx = (tempOtherDx + addThisX) * massRatioThis;
+        this.dy = (tempOtherDy + addThisY) * massRatioThis;
+        otherSphere.dx = (tempDx + addOtherX) * massRatioOther;
+        otherSphere.dy = (tempDy + addOtherY) * massRatioOther;
+        }
       }
     }
-  }
 
   checkMouse(){
     if(mouseX > this.x - this.radius  && mouseX < this.x + this.radius && mouseY < this.y + this.radius && mouseY > this.y - this.radius){
@@ -149,17 +183,17 @@ class Sphere {
   wallCollision(wall){
     if(this.x + this.radius >= wall.x - wall.width/10 && this.x + this.radius <= wall.x + wall.width/4 && this.y + this.radius >= wall.y && this.y - this.radius*2 <= wall.y){
       let tempVar = this.dx;
-      tempVar = tempVar - energyLoss/100;
+      tempVar = tempVar - this.energyLoss/100;
       this.dx = 0 - tempVar;
     }
     else if(this.y + this.radius >= wall.y && this.y + this.radius <= wall.y + wall.height && this.x + this.radius > wall.x && this.x - this.radius < wall.x + wall.width){
       let tempVar = this.dy;
-      tempVar = tempVar - energyLoss/100;
+      tempVar = tempVar - this.energyLoss/100;
       this.dy = 0 - tempVar;
     }
     else if(this.y - this.radius <= wall.y + wall.height && this.y - this.radius >= wall.y && this.x + this.radius > wall.x && this.x - this.radius < wall.x + wall.width){
       let tempVar = this.dy;
-      tempVar = tempVar - energyLoss/100;
+      tempVar = tempVar - this.energyLoss/100;
       this.dy = 0 - tempVar;
     }
   }
@@ -211,7 +245,8 @@ function setup() {
   planet = "Earth";
   allowed = true;
   energyLoss = 20;//for some unbeknowns't to me reason 10 seems to simulate fully elastic collisions
-  airResistanceY =
+  airResistanceY = 0;
+  airResistanceX = 10;
   createCanvas(windowWidth, windowHeight);
 }
 
@@ -235,7 +270,7 @@ function mousePressed(){
     checkIfRoom();
     if(allowed){
       //creates a ball
-      sphere = new Sphere(mouseX, mouseY, 15, -8, 0, determineColor(), g, 10);
+      sphere = new Sphere(mouseX, mouseY, 15, 0, 0, determineColor(), g, 20, energyLoss, airResistanceX, airResistanceY);
       objectArray.push(sphere);
     }
   }
@@ -243,7 +278,7 @@ function mousePressed(){
     checkIfRoom();
     if(allowed){
       //creates a ball
-      sphere = new Sphere(mouseX, mouseY, 15, -6, 0, determineColor(), g, 10);
+      sphere = new Sphere(mouseX, mouseY, 15, -6, 0, determineColor(), g, 20, energyLoss, airResistanceX, airResistanceY);
       objectArray.push(sphere);
     }
   }
@@ -251,7 +286,7 @@ function mousePressed(){
     checkIfRoom();
     if(allowed){
       //creates a ball
-      sphere = new Sphere(mouseX, mouseY, 15, -4, 0, determineColor(), g, 10);
+      sphere = new Sphere(mouseX, mouseY, 15, -4, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY);
       objectArray.push(sphere);
     }
   }
@@ -259,7 +294,7 @@ function mousePressed(){
     checkIfRoom();
     if(allowed){
       //creates a ball
-      sphere = new Sphere(mouseX, mouseY, 15, -2, 0, determineColor(), g, 10);
+      sphere = new Sphere(mouseX, mouseY, 15, -2, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY);
       objectArray.push(sphere);
     }
   }
@@ -273,7 +308,7 @@ function mousePressed(){
     checkIfRoom();
     if(allowed){
       //creates a ball
-      sphere = new Sphere(mouseX, mouseY, 15, 2, 0, determineColor(), g, 10);
+      sphere = new Sphere(mouseX, mouseY, 15, 2, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY);
       objectArray.push(sphere);
     }
   }
@@ -281,7 +316,7 @@ function mousePressed(){
     checkIfRoom();
     if(allowed){
       //creates a ball
-      sphere = new Sphere(mouseX, mouseY, 15, 4, 0, determineColor(), g, 10);
+      sphere = new Sphere(mouseX, mouseY, 15, 4, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY);
       objectArray.push(sphere);
     }
   }
@@ -289,7 +324,7 @@ function mousePressed(){
     checkIfRoom();
     if(allowed){
       //creates a ball
-      sphere = new Sphere(mouseX, mouseY, 15, 6, 0, determineColor(), g, 10);
+      sphere = new Sphere(mouseX, mouseY, 15, 6, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY);
       objectArray.push(sphere);
     }
   }
@@ -297,7 +332,7 @@ function mousePressed(){
     checkIfRoom();
     if(allowed){
       //creates a ball
-      sphere = new Sphere(mouseX, mouseY, 15, 8, 0, determineColor(), g, 10);
+      sphere = new Sphere(mouseX, mouseY, 15, 8, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY);
       objectArray.push(sphere);
     }
   }
@@ -311,7 +346,7 @@ function mousePressed(){
 
 //creates a ball
 function spawnBall(){
-  sphere = new Sphere(mouseX, mouseY, 15, 0, 0, determineColor(), g, 10);
+  sphere = new Sphere(mouseX, mouseY, 15, 0, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY);
   objectArray.push(sphere);
 }
 
@@ -320,21 +355,21 @@ function explosive(){
   let bomb;
   let tempState = colorState;//sets tempState to colorState to store value
   colorState = 2; //makes explosion red
-  bomb = new Sphere(mouseX+20,mouseY,10,10,0,determineColor(),g,5);
+  bomb = new Sphere(mouseX+20,mouseY,10,10,0,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY);
   objectArray.push(bomb);
-  bomb = new Sphere(mouseX-20,mouseY,10,-10,0,determineColor(),g,5);
+  bomb = new Sphere(mouseX-20,mouseY,10,-10,0,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY);
   objectArray.push(bomb);
-  bomb = new Sphere(mouseX,mouseY-20,10,0,-10,determineColor(),0,5);
+  bomb = new Sphere(mouseX,mouseY-20,10,0,-10,determineColor(),0,5,energyLoss,airResistanceX,airResistanceY);
   objectArray.push(bomb);
-  bomb = new Sphere(mouseX,mouseY+20,10,0,10,determineColor(),g,5);
+  bomb = new Sphere(mouseX,mouseY+20,10,0,10,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY);
   objectArray.push(bomb);
-  bomb = new Sphere(mouseX+20,mouseY+20,10,6,7,determineColor(),g,5);
+  bomb = new Sphere(mouseX+20,mouseY+20,10,6,7,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY);
   objectArray.push(bomb);
-  bomb = new Sphere(mouseX-20,mouseY-20,10,4,-7,determineColor(),g,5);
+  bomb = new Sphere(mouseX-20,mouseY-20,10,4,-7,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY);
   objectArray.push(bomb);
-  bomb = new Sphere(mouseX-20,mouseY-20,10,-6,-5,determineColor(),0,5);
+  bomb = new Sphere(mouseX-20,mouseY-20,10,-6,-5,determineColor(),0,5,energyLoss,airResistanceX,airResistanceY);
   objectArray.push(bomb);
-  bomb = new Sphere(mouseX-20,mouseY+20,10,-6,6,determineColor(),g,5);
+  bomb = new Sphere(mouseX-20,mouseY+20,10,-6,6,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY);
   objectArray.push(bomb);
   colorState = tempState;//puts colorState back to normal
 }
