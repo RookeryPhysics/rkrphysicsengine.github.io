@@ -66,14 +66,14 @@ class Sphere {
     }
   }
 
-  airResistance(){
-    if(this.dx > 0 && this.airX != 0){
-      this.dx = this.dx - this.airX/100;
-    }
-    else if(this.dx < 0 && this.airX != 0){
-      this.dx = this.dx + this.airX/100;
-    }
-  }
+  //airResistance(){
+    //if(this.dx > 0 && this.airX !== 0){
+      //this.dx = this.dx - this.airX/100;
+    //}
+    //else if(this.dx < 0 && this.airX !== 0){
+    //  this.dx = this.dx + this.airX/100;
+    //}
+  //}
 
   //checks for collisions with other spheres
   collision(otherSphere){
@@ -83,30 +83,29 @@ class Sphere {
       if(this.x < otherSphere.x + otherSphere.radius/5 && this.x > otherSphere.x - otherSphere.radius/5 || this.y < otherSphere.y + otherSphere.radius/5 && this.y > otherSphere.y - otherSphere.radius/5){
         this.isCollide = true;
         otherSphere.isCollide = true;
-        if(this.dx > this.energyLoss/25){
-          this.dx = this.dx - this.energyLoss/25;
+        if(this.x < otherSphere.x){
+          //
+          addX = -10;
+          addOX = 10;
         }
-        else if(this.dx < 0 - this.energyLoss/25){
-          this.dx = this.dx + this.energyLoss/25;
+        else{
+          //
+          addX = 10;
+          addOX = -10;
         }
-        if(this.dy > this.energyLoss/25){
-          this.dy = this.dy - this.energyLoss/25;
+        if(this.y < otherSphere.y && this.y + this.radius < windowHeight - 70){
+          //
+          addY = -10;
+          addOY = 10;
         }
-        else if(this.dy < 0 - this.energyLoss/25){
-          this.dy = this.dy + this.energyLoss/25;
+        else{
+          addY = 10;
+          addOY = -10;
         }
-        if(otherSphere.dx > this.energyLoss/25){
-          otherSphere.dx = otherSphere.dx - this.energyLoss/25;
-        }
-        else if(otherSphere.dx < 0 - this.energyLoss/25){
-          otherSphere.dx = otherSphere.dx + this.energyLoss/25;
-        }
-        if(otherSphere.dy > this.energyLoss/25){
-          otherSphere.dy = otherSphere.dy - this.energyLoss/25;
-        }
-        else if(otherSphere.dy < 0 - this.energyLoss/25){
-          otherSphere.dy = otherSphere.dy + this.energyLoss/25;
-        }
+        this.x += addX;
+        this.y += addY;
+        otherSphere.x += addOX;
+        otherSphere.y += addOY;
         let tempDx = this.dx;
         let tempDy = this.dy;
         this.dx = otherSphere.dx * massRatioThis;
@@ -161,9 +160,9 @@ class Sphere {
         this.dy = (tempOtherDy + addThisY) * massRatioThis;
         otherSphere.dx = (tempDx + addOtherX) * massRatioOther;
         otherSphere.dy = (tempDy + addOtherY) * massRatioOther;
-        }
       }
     }
+  }
 
   checkMouse(){
     if(mouseX > this.x - this.radius  && mouseX < this.x + this.radius && mouseY < this.y + this.radius && mouseY > this.y - this.radius){
@@ -181,22 +180,22 @@ class Sphere {
 
   //collide with wall
   wallCollision(wall){
-    if(this.x + this.radius >= wall.x - wall.width/10 && this.x + this.radius <= wall.x + wall.width/4 && this.y + this.radius >= wall.y && this.y - this.radius*2 <= wall.y){
+    if(this.dx > 0 && this.x + this.radius >= wall.x - wall.width/10 && this.x + this.radius <= wall.x + wall.width/4 && this.y + this.radius >= wall.y && this.y - this.radius*2 <= wall.y){
       let tempVar = this.dx;
       tempVar = tempVar - this.energyLoss/100;
       this.dx = 0 - tempVar;
     }
-    else if(this.x - this.radius <= wall.x + wall.width + wall.width/10 && this.x - this.radius >= wall.x + wall.width*0.75 && this.y + this.radius >= wall.y && this.y - this.radius*2 <= wall.y){
+    else if(this.dx < 0 && this.x - this.radius <= wall.x + wall.width + wall.width/10 && this.x - this.radius >= wall.x + wall.width*0.75 && this.y + this.radius >= wall.y && this.y - this.radius*2 <= wall.y){
       let tempVar = this.dx;
       tempVar = tempVar - this.energyLoss/100;
       this.dx = 0 - tempVar;
     }
-    else if(this.y + this.radius >= wall.y && this.y + this.radius <= wall.y + wall.height && this.x + this.radius > wall.x && this.x - this.radius < wall.x + wall.width){
+    else if(this.dy > 0 && this.y + this.radius >= wall.y && this.y + this.radius <= wall.y + wall.height && this.x + this.radius > wall.x && this.x - this.radius < wall.x + wall.width){
       let tempVar = this.dy;
       tempVar = tempVar - this.energyLoss/100;
       this.dy = 0 - tempVar;
     }
-    else if(this.y - this.radius <= wall.y + wall.height && this.y - this.radius >= wall.y && this.x + this.radius > wall.x && this.x - this.radius < wall.x + wall.width){
+    else if(this.dy < 0 && this.y - this.radius <= wall.y + wall.height && this.y - this.radius >= wall.y && this.x + this.radius > wall.x && this.x - this.radius < wall.x + wall.width){
       let tempVar = this.dy;
       tempVar = tempVar - this.energyLoss/100;
       this.dy = 0 - tempVar;
@@ -239,6 +238,7 @@ let colorState;
 let energyLoss;
 let allowed;
 let addThisX, addThisY, addOtherX, addOtherY;
+let addX, addY, addOX, addOY;
 let totalSpeed, quarterSpeed;
 let airResistanceY;//coefficient of air resistance
 let airResistanceX;//wind
@@ -275,7 +275,7 @@ function mousePressed(){
     checkIfRoom();
     if(allowed){
       //creates a ball
-      sphere = new Sphere(mouseX, mouseY, 15, 0, 0, determineColor(), g, 20, energyLoss, airResistanceX, airResistanceY);
+      sphere = new Sphere(mouseX, mouseY, 25, 0, 0, determineColor(), g, 25, energyLoss, airResistanceX, airResistanceY);
       objectArray.push(sphere);
     }
   }
@@ -459,7 +459,7 @@ function stateDiety(){
       objectArray[i].show();
       objectArray[i].update();
       objectArray[i].surfaceGravity();
-      objectArray[i].airResistance();
+      //objectArray[i].airResistance();
       objectArray[i].suddenChangeInAttitude();
       if(mouseIsPressed){
         for(let c = 0; c < objectArray.length; c++){
@@ -488,7 +488,7 @@ function stateDiety(){
       objectArray[f].show();
       objectArray[f].update();
       objectArray[f].altitudeGravity();
-      objectArray[i].airResistance();
+    //  objectArray[i].airResistance();
       if(mouseIsPressed){
         for(let c = 0; c < objectArray.length; c++){
           if(objectArray[c].checkMouse() === true){
@@ -517,7 +517,7 @@ function stateDiety(){
       objectArray[f].show();
       objectArray[f].update();
       objectArray[f].surfaceGravity();
-      objectArray[i].airResistance();
+      //objectArray[i].airResistance();
       objectArray[f].buoyancy();
       if(mouseIsPressed){
         for(let c = 0; c < objectArray.length; c++){
