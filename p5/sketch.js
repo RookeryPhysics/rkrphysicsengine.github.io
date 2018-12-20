@@ -61,6 +61,7 @@ class Sphere {
   //bounces ball off the surface
   suddenChangeInAttitude(){
     if(this.y > windowHeight - 30 - this.radius){
+      this.y = windowHeight - 30 - this.radius;
       this.dy = this.dy - this.energyLoss/100;
       this.dy = 0 - this.dy;
     }
@@ -93,19 +94,10 @@ class Sphere {
           addX = 10;
           addOX = -10;
         }
-        if(this.y < otherSphere.y && this.y + this.radius < windowHeight - 70){
-          //
-          addY = -10;
-          addOY = 10;
-        }
-        else{
-          addY = 10;
-          addOY = -10;
-        }
         this.x += addX;
-        this.y += addY;
+        //this.y += addY;
         otherSphere.x += addOX;
-        otherSphere.y += addOY;
+        //otherSphere.y += addOY;
         let tempDx = this.dx;
         let tempDy = this.dy;
         this.dx = otherSphere.dx * massRatioThis;
@@ -387,6 +379,12 @@ function keyPressed(){
   }
   if(keyIsDown(32)){
     explosive();
+  }
+  if(keyIsDown(84)){
+    wall = new Wall(mouseX,mouseY,300,10,determineColor());
+    staticObjectArray.push(wall);
+    wall = new Wall(mouseX,mouseY + 100,300,10,determineColor());
+    staticObjectArray.push(wall);
   }
 }
 
