@@ -50,12 +50,12 @@ class Sphere {
 
   //applies gravitational acceleration at surface
   surfaceGravity(){
-    this.dy = this.dy + 1/this.g;
+    this.dy = this.dy + this.g/50;
   }
 
   //high altitude gravity
   altitudeGravity(){
-    this.dy = this.dy + 1/this.g;
+    this.dy = this.dy + this.g/50;
   }
 
   //bounces ball off the surface
@@ -263,7 +263,7 @@ function checkIfRoom(){
 //called when mouse is pressed
 function mousePressed(){
   checkIfRoom();
-  if(keyIsDown(49) && state === "surface" || state === "altitude"){
+  if(keyIsDown(49) && state === "surface" || keyIsDown(49) && state === "altitude"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -271,7 +271,7 @@ function mousePressed(){
       objectArray.push(sphere);
     }
   }
-  else if(keyIsDown(50) && state === "surface" || state === "altitude"){
+  else if(keyIsDown(50) && state === "surface" || keyIsDown(50) && state === "altitude"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -279,7 +279,7 @@ function mousePressed(){
       objectArray.push(sphere);
     }
   }
-  else if(keyIsDown(51) && state === "surface" || state === "altitude"){
+  else if(keyIsDown(51) && state === "surface" || keyIsDown(51) && state === "altitude"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -287,7 +287,7 @@ function mousePressed(){
       objectArray.push(sphere);
     }
   }
-  else if(keyIsDown(52) && state === "surface" || state === "altitude"){
+  else if(keyIsDown(52) && state === "surface" || keyIsDown(52) && state === "altitude"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -295,13 +295,13 @@ function mousePressed(){
       objectArray.push(sphere);
     }
   }
-  else if(keyIsDown(53) && state === "surface" || state === "altitude"){
+  else if(keyIsDown(53) && state === "surface" || keyIsDown(53) && state === "altitude"){
     checkIfRoom();
     if(allowed){
       spawnBall();
     }
   }
-  else if(keyIsDown(54) && state === "surface" || state === "altitude"){
+  else if(keyIsDown(54) && state === "surface" || keyIsDown(54) && state === "altitude"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -309,7 +309,7 @@ function mousePressed(){
       objectArray.push(sphere);
     }
   }
-  else if(keyIsDown(55) && state === "surface" || state === "altitude"){
+  else if(keyIsDown(55) && state === "surface" || keyIsDown(55) && state === "altitude"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -317,7 +317,7 @@ function mousePressed(){
       objectArray.push(sphere);
     }
   }
-  else if(keyIsDown(56) && state === "surface" || state === "altitude"){
+  else if(keyIsDown(56) && state === "surface" || keyIsDown(56) && state === "altitude"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -325,7 +325,7 @@ function mousePressed(){
       objectArray.push(sphere);
     }
   }
-  else if(keyIsDown(57) && state === "surface" || state === "altitude"){
+  else if(keyIsDown(57) && state === "surface" || keyIsDown(57) && state === "altitude"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -433,6 +433,7 @@ function showSurface(){
     background(0);
     fill(255,0,0,255);
     rect(0,windowHeight-30,windowWidth,30);
+    g = 3;
   }
 }
 
@@ -486,7 +487,7 @@ function stateDiety(){
       objectArray[f].show();
       objectArray[f].update();
       objectArray[f].altitudeGravity();
-    //  objectArray[i].airResistance();
+      //objectArray[i].airResistance();
       if(mouseIsPressed){
         for(let c = 0; c < objectArray.length; c++){
           if(objectArray[c].checkMouse() === true){
@@ -524,6 +525,12 @@ function stateDiety(){
           }
         }
       }
+    }
+  }
+  else if(state === "space"){
+    background(0);
+    for(let s = 0; s < staticObjectArray.length; s++){
+      staticObjectArray[s].show();
     }
   }
 }
