@@ -34,6 +34,7 @@ class Sphere {
     this.energyLoss = energyLoss;
     this.airX = airResistanceX;
     this.airY = airResistanceY;
+    this.gravityOff = false;
   }
 
   //displays sphere
@@ -50,12 +51,16 @@ class Sphere {
 
   //applies gravitational acceleration at surface
   surfaceGravity(){
-    this.dy = this.dy + this.g/50;
+    if(!this.gravityOff){
+      this.dy = this.dy + this.g/100;
+    }
   }
 
   //high altitude gravity
   altitudeGravity(){
-    this.dy = this.dy + this.g/50;
+    if(!this.gravityOff){
+      this.dy = this.dy + this.g/100;
+    }
   }
 
   //bounces ball off the surface
@@ -81,7 +86,15 @@ class Sphere {
     if(dist(this.x,this.y,otherSphere.x,otherSphere.y) < this.radius + otherSphere.radius + 2){//add two so not as many balls get stuck in eachother
       let massRatioOther = this.mass/otherSphere.mass;
       let massRatioThis = otherSphere.mass/this.mass;
-      if(this.x < otherSphere.x + otherSphere.radius/5 && this.x > otherSphere.x - otherSphere.radius/5 || this.y < otherSphere.y + otherSphere.radius/5 && this.y > otherSphere.y - otherSphere.radius/5){
+      if(this.x === otherSphere.x){
+        let tempDx = this.dx;
+        let tempDy = this.dy;
+        this.dx = otherSphere.dx * massRatioThis;
+        this.dy = otherSphere.dy * massRatioThis;
+        otherSphere.dx = tempDx * massRatioOther;
+        otherSphere.dy = tempDy * massRatioOther;
+      }
+      else if(this.x < otherSphere.x + otherSphere.radius/5 && this.x > otherSphere.x - otherSphere.radius/5 || this.y < otherSphere.y + otherSphere.radius/5 && this.y > otherSphere.y - otherSphere.radius/5){
         this.isCollide = true;
         otherSphere.isCollide = true;
         if(this.x < otherSphere.x){
@@ -193,7 +206,22 @@ class Sphere {
       this.dy = 0 - tempVar;
     }
   }
+
+  buoyancy(){
+    if(this.dy > -0.9 && this.y > 500 && this.mass/this.radius < 1){//apply buoyancy
+      this.dy = this.dy - g/60;
+    }
+    else if(this.y > 500){//slow down x axis speed in water
+      if(this.dx > 0 + 0.1){
+        this.dx = this.dx - 0.1;
+      }
+      else if(this.dx < 0 - 0.1){
+        this.dx = this.dx + 0.1;
+      }
+    }
+  }
 }
+
 
 class Timer {
   constructor(waitTime) {
@@ -238,7 +266,7 @@ let airResistanceX;//wind
 function setup() {
   g = 9.81;
   colorState = 0;
-  state = "surface";
+  state = "ocean";
   planet = "Earth";
   allowed = true;
   energyLoss = 20;//for some unbeknowns't to me reason 10 seems to simulate fully elastic collisions
@@ -263,7 +291,7 @@ function checkIfRoom(){
 //called when mouse is pressed
 function mousePressed(){
   checkIfRoom();
-  if(keyIsDown(49) && state === "surface" || keyIsDown(49) && state === "altitude"){
+  if(keyIsDown(49) && state === "surface" || keyIsDown(49) && state === "altitude" || keyIsDown(49) && state === "ocean"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -271,7 +299,7 @@ function mousePressed(){
       objectArray.push(sphere);
     }
   }
-  else if(keyIsDown(50) && state === "surface" || keyIsDown(50) && state === "altitude"){
+  else if(keyIsDown(50) && state === "surface" || keyIsDown(50) && state === "altitude" || keyIsDown(50) && state === "ocean"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -279,7 +307,7 @@ function mousePressed(){
       objectArray.push(sphere);
     }
   }
-  else if(keyIsDown(51) && state === "surface" || keyIsDown(51) && state === "altitude"){
+  else if(keyIsDown(51) && state === "surface" || keyIsDown(51) && state === "altitude" || keyIsDown(51) && state === "ocean"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -287,7 +315,7 @@ function mousePressed(){
       objectArray.push(sphere);
     }
   }
-  else if(keyIsDown(52) && state === "surface" || keyIsDown(52) && state === "altitude"){
+  else if(keyIsDown(52) && state === "surface" || keyIsDown(52) && state === "altitude" || keyIsDown(52) && state === "ocean"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -295,13 +323,13 @@ function mousePressed(){
       objectArray.push(sphere);
     }
   }
-  else if(keyIsDown(53) && state === "surface" || keyIsDown(53) && state === "altitude"){
+  else if(keyIsDown(53) && state === "surface" || keyIsDown(53) && state === "altitude" || keyIsDown(53) && state === "ocean"){
     checkIfRoom();
     if(allowed){
       spawnBall();
     }
   }
-  else if(keyIsDown(54) && state === "surface" || keyIsDown(54) && state === "altitude"){
+  else if(keyIsDown(54) && state === "surface" || keyIsDown(54) && state === "altitude" || keyIsDown(54) && state === "ocean"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -309,7 +337,7 @@ function mousePressed(){
       objectArray.push(sphere);
     }
   }
-  else if(keyIsDown(55) && state === "surface" || keyIsDown(55) && state === "altitude"){
+  else if(keyIsDown(55) && state === "surface" || keyIsDown(55) && state === "altitude" || keyIsDown(55) && state === "ocean"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -317,7 +345,7 @@ function mousePressed(){
       objectArray.push(sphere);
     }
   }
-  else if(keyIsDown(56) && state === "surface" || keyIsDown(56) && state === "altitude"){
+  else if(keyIsDown(56) && state === "surface" || keyIsDown(56) && state === "altitude" || keyIsDown(56) && state === "ocean"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -325,7 +353,7 @@ function mousePressed(){
       objectArray.push(sphere);
     }
   }
-  else if(keyIsDown(57) && state === "surface" || keyIsDown(57) && state === "altitude"){
+  else if(keyIsDown(57) && state === "surface" || keyIsDown(57) && state === "altitude" || keyIsDown(57) && state === "ocean"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -333,7 +361,7 @@ function mousePressed(){
       objectArray.push(sphere);
     }
   }
-  else if(state === "surface" || state === "altitude"){
+  else if(state === "surface" || state === "altitude" || state === "ocean"){
     checkIfRoom();
     if(allowed){
       spawnBall();
@@ -423,17 +451,19 @@ function showSurface(){
     background(0,255,255,255);
     fill(0,200,0);
     rect(0,windowHeight-30,windowWidth,30);
+    g = 9.81;
   }
   else if(planet === "Moon"){
     background(0);
     fill(100,100,100,255);
     rect(0,windowHeight-30,windowWidth,30);
+    g = 1.62;
   }
   else if(planet === "Mars"){
     background(0);
     fill(255,0,0,255);
     rect(0,windowHeight-30,windowWidth,30);
-    g = 3;
+    g = 3.71;
   }
 }
 
@@ -498,8 +528,9 @@ function stateDiety(){
     }
   }
   else if(state === "ocean"){
-    //
     background(0,255,255,255);
+    fill(0,0,220,255);
+    rect(0,500,windowWidth,windowHeight);
     for(let r = 0; r < staticObjectArray.length; r++){
       staticObjectArray[r].show();
       for(let e = 0; e < objectArray.length; e++){
