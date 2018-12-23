@@ -130,6 +130,7 @@ class Sphere {
         }
         else if(this.x > otherSphere.x && this.y < otherSphere.y){
           //
+          //
           totalSpeed = abs(this.dx) + abs(this.dy) + abs(otherSphere.dx) + abs(otherSphere.dy);
           quarterSpeed = totalSpeed / 4;
           addThisX = quarterSpeed - this.energyLoss/25;
@@ -257,6 +258,7 @@ let planet;
 let colorState;
 let energyLoss;
 let allowed;
+let godIsDead;
 let addThisX, addThisY, addOtherX, addOtherY;
 let addX, addY, addOX, addOY;
 let totalSpeed, quarterSpeed;
@@ -269,6 +271,7 @@ function setup() {
   state = "ocean";
   planet = "Earth";
   allowed = true;
+  godIsDead = true;
   energyLoss = 20;//for some unbeknowns't to me reason 10 seems to simulate fully elastic collisions
   airResistanceY = 0;
   airResistanceX = 0.5;
