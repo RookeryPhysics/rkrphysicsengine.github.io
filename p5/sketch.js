@@ -223,6 +223,45 @@ class Sphere {
   }
 }
 
+class Planet {
+  constructor(x,y,dx,dy,radius,color){
+    this.x = x;
+    this.y = y;
+    this.dx = dx;
+    this.dy = dy;
+    this.radius = radius;
+    this.color = color;
+  }
+
+  show(){
+    fill(this.color);
+    ellipse(this.x,this.y,this.radius*2,this.radius*2);
+  }
+
+  update(){
+    this.x += this.dx;
+    this.y += this.dy;
+  }
+
+  orbit(){
+    if(this.x < windowWidth / 2 && this.y < windowHeight / 2){
+      this.dx += 0.05;
+      this.dy += 0.05
+    }
+    else if(this.x > windowWidth / 2 && this.y < windowHeight / 2){
+      this.dx -= 0.05;
+      this.dy += 0.05;
+    }
+    else if(this.x > windowWidth / 2 && this.y > windowHeight / 2){
+      this.dx -= 0.05;
+      this.dy += 0.05;
+    }
+    else if(this.x < windowWidth / 2 && this.y > windowHeight / 2){
+      this.dx += 0.05;
+      this.dy -= 0.05;
+    }
+  }
+}
 
 class Timer {
   constructor(waitTime) {
@@ -253,6 +292,7 @@ let radius;
 let object;
 let objectArray = [];
 let staticObjectArray = [];
+let orbitalArray = [];
 let state;
 let planet;
 let colorState;
@@ -268,7 +308,7 @@ let airResistanceX;//wind
 function setup() {
   g = 9.81;
   colorState = 0;
-  state = "ocean";
+  state = "space";
   planet = "Earth";
   allowed = true;
   godIsDead = true;
@@ -294,6 +334,10 @@ function checkIfRoom(){
 //called when mouse is pressed
 function mousePressed(){
   checkIfRoom();
+  if(state === "space"){
+    let planet = new Planet(mouseX,mouseY,-2,0,15,color(0,255,255));
+    orbitalArray.push(planet);
+  }
   if(keyIsDown(49) && state === "surface" || keyIsDown(49) && state === "altitude" || keyIsDown(49) && state === "ocean"){
     checkIfRoom();
     if(allowed){
@@ -565,6 +609,11 @@ function stateDiety(){
     background(0);
     for(let s = 0; s < staticObjectArray.length; s++){
       staticObjectArray[s].show();
+    }
+    for(let e = 0; e < orbitalArray.length; e++){
+      orbitalArray[e].show();
+      orbitalArray[e].update();
+      orbitalArray[e].orbit();
     }
   }
 }
