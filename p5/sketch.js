@@ -308,7 +308,7 @@ let airResistanceX;//wind
 function setup() {
   g = 9.81;
   colorState = 0;
-  state = "space";
+  state = "surface";
   planet = "Earth";
   allowed = true;
   godIsDead = true;
