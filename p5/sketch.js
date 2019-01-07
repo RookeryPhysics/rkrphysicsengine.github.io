@@ -20,6 +20,68 @@ class Wall{
   }
 }
 
+class Box {
+  constructor(x,y,width,height,dx,dy,color,g,mass,energyLoss,airResistanceX,airResistanceY){
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.dx = dx;
+    this.dy = dy;
+    this.color = color;
+    this.g = g;
+    this.mass = mass;
+    let isCollide = false;
+    this.energyLoss = energyLoss;
+    this.airX = airResistanceX;
+    this.airY = airResistanceY;
+  }
+
+  show(){
+    fill(this.color);
+    rect(this.x,this.y,this.width,this.height);
+  }
+
+  update(){
+    this.x = this.x + this.dx;
+    this.y = this.y + this.dy;
+  }
+
+  surfaceGravity(){
+    this.dy = this.dy + this.g/50;
+  }
+
+  altitudeGravity(){
+    this.dy = this.dy + this.g/55;
+  }
+
+  suddenChangeInAttitude(){
+    if(this.y > windowHeight - 30 - this.height){
+      this.y = windowHeight - 30 - this.height;
+      this.dy = this.dy - this.energyLoss/50;
+      this.dy = 0 - this.dy;
+    }
+  }
+
+  checkMouse(){
+    if(mouseX > this.x && mouseX < this.x + this.width && mouseY < this.y + this.height && mouseY > this.y){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+
+  collision(){
+    //
+  }
+
+  dragObject(){
+    this.x = mouseX;
+    this.y = mouseY;
+  }
+}
+
 class Sphere {
   constructor(x,y,radius,dx,dy,color,g,mass,energyLoss,airResistanceX,airResistanceY){
     this.x = x;
@@ -55,7 +117,7 @@ class Sphere {
 
   //high altitude gravity
   altitudeGravity(){
-    this.dy = this.dy + this.g/50;
+    this.dy = this.dy + this.g/55;
   }
 
   //bounces ball off the surface
@@ -67,14 +129,14 @@ class Sphere {
     }
   }
 
-  //airResistance(){
-    //if(this.dx > 0 && this.airX !== 0){
-      //this.dx = this.dx - this.airX/100;
-    //}
-    //else if(this.dx < 0 && this.airX !== 0){
-    //  this.dx = this.dx + this.airX/100;
-    //}
-  //}
+  airResistance(){
+    if(this.dx > 0 && this.airX !== 0){
+      this.dx = this.dx - this.airX/100;
+    }
+    else if(this.dx < 0 && this.airX !== 0){
+      this.dx = this.dx + this.airX/100;
+    }
+  }
 
   //checks for collisions with other spheres
   collision(otherSphere){
@@ -312,9 +374,9 @@ function mousePressed(){
   else if(keyIsDown(55) && state === "surface" || keyIsDown(55) && state === "altitude"){
     checkIfRoom();
     if(allowed){
-      //creates a ball
-      sphere = new Sphere(mouseX, mouseY, 15, 4, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY);
-      objectArray.push(sphere);
+      //creates a ball  x,y,width,height,dx,dy,color,g,mass,energyLoss,airResistanceX,airResistanceY
+      box = new Box(mouseX, mouseY, 20, 20, 0, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY);
+      objectArray.push(box);
     }
   }
   else if(keyIsDown(56) && state === "surface" || keyIsDown(56) && state === "altitude"){
