@@ -30,6 +30,7 @@ class Box {
     this.dy = dy;
     this.color = color;
     this.g = g;
+    this.radius = width/2;
     this.mass = mass;
     let isCollide = false;
     this.energyLoss = energyLoss;
@@ -58,7 +59,13 @@ class Box {
   suddenChangeInAttitude(){
     if(this.y > windowHeight - 30 - this.height){
       this.y = windowHeight - 30 - this.height;
-      this.dy = this.dy - this.energyLoss/50;
+      if(this.dy > 2 || this.dy < -2){
+        this.dy = this.dy * 0.6;
+      }
+      else if(this.dy > -2 || this.dy < 2){
+        this.dy = 0;
+        this.y = windowHeight - 30 - this.height;
+      }
       this.dy = 0 - this.dy;
     }
   }
@@ -72,13 +79,97 @@ class Box {
     }
   }
 
-  collision(){
-    //
+  collision(otherSphere){
+    if(dist(this.x,this.y,otherSphere.x,otherSphere.y) < this.radius + otherSphere.radius + 2){//add two so not as many balls get stuck in eachother
+      let massRatioOther = this.mass/otherSphere.mass;
+      let massRatioThis = otherSphere.mass/this.mass;
+      if(this.x < otherSphere.x + otherSphere.radius/5 && this.x > otherSphere.x - otherSphere.radius/5 || this.y < otherSphere.y + otherSphere.radius/5 && this.y > otherSphere.y - otherSphere.radius/5){
+        this.isCollide = true;
+        otherSphere.isCollide = true;
+        if(this.x < otherSphere.x){
+          //
+          addX = -10;
+          addOX = 10;
+        }
+        else{
+          //
+          addX = 10;
+          addOX = -10;
+        }
+        this.x += addX;
+        //this.y += addY;
+        otherSphere.x += addOX;
+        //otherSphere.y += addOY;
+        let tempDx = this.dx;
+        let tempDy = this.dy;
+        this.dx = otherSphere.dx * massRatioThis;
+        this.dy = otherSphere.dy * massRatioThis;
+        otherSphere.dx = tempDx * massRatioOther;
+        otherSphere.dy = tempDy * massRatioOther;
+      }
+      else{
+        if(this.x < otherSphere.x && this.y < otherSphere.y){
+          //
+          totalSpeed = abs(this.dx) + abs(this.dy) + abs(otherSphere.dx) + abs(otherSphere.dy);
+          quarterSpeed = totalSpeed / 4;
+          addThisX = 0 - quarterSpeed + this.energyLoss/25;
+          addThisY = 0 - quarterSpeed + this.energyLoss/25;
+          addOtherX = quarterSpeed - this.energyLoss/25;
+          addOtherY = quarterSpeed - this.energyLoss/25;
+        }
+        else if(this.x > otherSphere.x && this.y < otherSphere.y){
+          //
+          totalSpeed = abs(this.dx) + abs(this.dy) + abs(otherSphere.dx) + abs(otherSphere.dy);
+          quarterSpeed = totalSpeed / 4;
+          addThisX = quarterSpeed - this.energyLoss/25;
+          addThisY = 0 - quarterSpeed + this.energyLoss/25;
+          addOtherX = 0 - quarterSpeed + this.energyLoss/25;
+          addOtherY = quarterSpeed - this.energyLoss/25;
+        }
+        else if(this.x > otherSphere.x && this.y > otherSphere.y){
+          //
+          totalSpeed = abs(this.dx) + abs(this.dy) + abs(otherSphere.dx) + abs(otherSphere.dy);
+          quarterSpeed = totalSpeed / 4;
+          addThisX = quarterSpeed - this.energyLoss/25;
+          addThisY = quarterSpeed - this.energyLoss/25;
+          addOtherX = 0 - quarterSpeed + this.energyLoss/25;
+          addOtherY = 0 - quarterSpeed + this.energyLoss/25;
+        }
+        else if(this.x < otherSphere.x && this.y > otherSphere.y){
+          //
+          totalSpeed = abs(this.dx) + abs(this.dy) + abs(otherSphere.dx) + abs(otherSphere.dy);
+          quarterSpeed = totalSpeed / 4;
+          addThisX = 0 - quarterSpeed + this.energyLoss/25;
+          addThisY = quarterSpeed - this.energyLoss/25;
+          addOtherX = quarterSpeed - this.energyLoss/25;
+          addOtherY = 0 - quarterSpeed + this.energyLoss/25;
+        }
+        this.isCollide = true;
+        otherSphere.isCollide = true;
+        let tempDx = this.dx / 2;
+        let tempDy = this.dy / 2;
+        let tempOtherDx = otherSphere.dx / 2;
+        let tempOtherDy = otherSphere.dy / 2;
+        this.dx = (tempOtherDx + addThisX) * massRatioThis;
+        this.dy = (tempOtherDy + addThisY) * massRatioThis;
+        otherSphere.dx = (tempDx + addOtherX) * massRatioOther;
+        otherSphere.dy = (tempDy + addOtherY) * massRatioOther;
+      }
+    }
   }
 
   dragObject(){
     this.x = mouseX;
     this.y = mouseY;
+  }
+
+  airResistance(){
+    if(this.dx > 0 && this.airX !== 0){
+      this.dx = this.dx - this.airX/100;
+    }
+    else if(this.dx < 0 && this.airX !== 0){
+      this.dx = this.dx + this.airX/100;
+    }
   }
 }
 
@@ -374,7 +465,7 @@ function mousePressed(){
   else if(keyIsDown(55) && state === "surface" || keyIsDown(55) && state === "altitude"){
     checkIfRoom();
     if(allowed){
-      //creates a ball  x,y,width,height,dx,dy,color,g,mass,energyLoss,airResistanceX,airResistanceY
+      //creates a ball
       box = new Box(mouseX, mouseY, 20, 20, 0, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY);
       objectArray.push(box);
     }
@@ -520,7 +611,7 @@ function stateDiety(){
       objectArray[i].show();
       objectArray[i].update();
       objectArray[i].surfaceGravity();
-      //objectArray[i].airResistance();
+      objectArray[i].airResistance();
       objectArray[i].suddenChangeInAttitude();
       if(mouseIsPressed){
         for(let c = 0; c < objectArray.length; c++){
@@ -549,7 +640,7 @@ function stateDiety(){
       objectArray[f].show();
       objectArray[f].update();
       objectArray[f].altitudeGravity();
-      //objectArray[i].airResistance();
+      objectArray[f].airResistance();
       if(mouseIsPressed){
         for(let c = 0; c < objectArray.length; c++){
           if(objectArray[c].checkMouse() === true){
@@ -578,7 +669,7 @@ function stateDiety(){
       objectArray[f].show();
       objectArray[f].update();
       objectArray[f].surfaceGravity();
-      //objectArray[i].airResistance();
+      objectArray[f].airResistance();
       objectArray[f].buoyancy();
       if(mouseIsPressed){
         for(let c = 0; c < objectArray.length; c++){
