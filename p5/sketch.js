@@ -80,7 +80,7 @@ class Box {
   }
 
   collision(otherSphere){
-    if(dist(this.x,this.y,otherSphere.x,otherSphere.y) < this.radius + otherSphere.radius + 2){//add two so not as many balls get stuck in eachother
+    if(dist(this.x+this.width/2,this.y+this.height/2,otherSphere.x,otherSphere.y) < this.width / 2 + otherSphere.radius + 2){//add two so not as many balls get stuck in eachother
       let massRatioOther = this.mass/otherSphere.mass;
       let massRatioThis = otherSphere.mass/this.mass;
       if(this.x < otherSphere.x + otherSphere.radius/5 && this.x > otherSphere.x - otherSphere.radius/5 || this.y < otherSphere.y + otherSphere.radius/5 && this.y > otherSphere.y - otherSphere.radius/5){
@@ -155,6 +155,30 @@ class Box {
         otherSphere.dx = (tempDx + addOtherX) * massRatioOther;
         otherSphere.dy = (tempDy + addOtherY) * massRatioOther;
       }
+    }
+  }
+
+  //collide with wall
+  wallCollision(wall){
+    if(this.dx > 0 && this.x + this.radius >= wall.x - wall.width/10 && this.x + this.radius <= wall.x + wall.width/4 && this.y + this.radius >= wall.y && this.y - this.radius*2 <= wall.y){
+      let tempVar = this.dx;
+      tempVar = tempVar - this.energyLoss/100;
+      this.dx = 0 - tempVar;
+    }
+    else if(this.dx < 0 && this.x - this.radius <= wall.x + wall.width + wall.width/10 && this.x - this.radius >= wall.x + wall.width*0.75 && this.y + this.radius >= wall.y && this.y - this.radius*2 <= wall.y){
+      let tempVar = this.dx;
+      tempVar = tempVar - this.energyLoss/100;
+      this.dx = 0 - tempVar;
+    }
+    else if(this.dy > 0 && this.y + this.radius >= wall.y && this.y + this.radius <= wall.y + wall.height && this.x + this.radius > wall.x && this.x - this.radius < wall.x + wall.width){
+      let tempVar = this.dy;
+      tempVar = tempVar - this.energyLoss/100;
+      this.dy = 0 - tempVar;
+    }
+    else if(this.dy < 0 && this.y - this.radius <= wall.y + wall.height && this.y - this.radius >= wall.y && this.x + this.radius > wall.x && this.x - this.radius < wall.x + wall.width){
+      let tempVar = this.dy;
+      tempVar = tempVar - this.energyLoss/100;
+      this.dy = 0 - tempVar;
     }
   }
 
