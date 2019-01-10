@@ -411,6 +411,17 @@ let addX, addY, addOX, addOY;
 let totalSpeed, quarterSpeed;
 let airResistanceY;//coefficient of air resistance
 let airResistanceX;//wind
+let userRadius;
+let userMass;
+let userVelocity;
+let leftArrow, rightArrow, upArrow, downArrow;
+
+function preload(){
+  leftArrow = loadImage("assets/leftarrow.png");
+  rightArrow = loadImage("assets/rightarrow.png");
+  //upArrow = loadImage("assets/upArrow.png");
+  //downArrow = loadImage("assets/downArrow.png");
+}
 
 function setup() {
   g = 9.81;
@@ -418,6 +429,9 @@ function setup() {
   state = "surface";
   planet = "Earth";
   allowed = true;
+  userVelocity = 0;
+  userRadius = 50;
+  userMass = 10;
   energyLoss = 20;//for some unbeknowns't to me reason 10 seems to simulate fully elastic collisions
   airResistanceY = 0;
   airResistanceX = 0.5;
@@ -437,10 +451,25 @@ function checkIfRoom(){
   }
 }
 
+image(leftArrow, 50, 350, 70, 100);
+image(rightArrow, 150, 350, 70, 100);
+
 //called when mouse is pressed
 function mousePressed(){
   checkIfRoom();
-  if(keyIsDown(49) && state === "surface" || keyIsDown(49) && state === "altitude"){
+  if(state !== "options" && mouseX < 100 && mouseY < 100){
+    state = "options";
+  }
+  else if(state === "options" && mouseX < 100 && mouseY < 100){
+    state = "surface";
+  }
+  else if(state === "options" && mouseX < 120 && mouseX > 50 && mouseY > 350 && mouseY < 450){
+    userVelocity--;
+  }
+  else if(state === "options" && mouseY > 350 && mouseY < 450 && mouseX > 150 && mouseX < 220){
+    userVelocity++;
+  }
+  else if(keyIsDown(49) && state === "surface" || keyIsDown(49) && state === "altitude"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -520,7 +549,7 @@ function mousePressed(){
 
 //creates a ball
 function spawnBall(){
-  sphere = new Sphere(mouseX, mouseY, 15, 0, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY);
+  sphere = new Sphere(mouseX, mouseY, userRadius, userVelocity, 0, determineColor(), g, userMass, energyLoss, airResistanceX, airResistanceY);
   objectArray.push(sphere);
 }
 
@@ -710,4 +739,21 @@ function stateDiety(){
       staticObjectArray[s].show();
     }
   }
+  else if(state === "options"){
+    optionScreen();
+  }
+}
+
+function optionScreen(){
+  background(0);
+  textSize(25);
+  text("Object Spawn Interface", 900, 150, 100);
+  text("Obj. Velocity and Direction -/+", 100, 50, 100);
+  text("Obj. Mass", 400, 50, 100);
+  text("Obj. Size", 700, 50, 100);
+  text(str(userVelocity), 100, 250, 100);
+  text(str(userMass), 400, 250, 100);
+  text(str(userRadius), 700, 250, 100);
+  image(leftArrow, 50, 350, 70, 100);
+  image(rightArrow, 150, 350, 70, 100);
 }
