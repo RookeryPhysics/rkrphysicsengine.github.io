@@ -36,6 +36,7 @@ class Box {
     this.energyLoss = energyLoss;
     this.airX = airResistanceX;
     this.airY = airResistanceY;
+    this.onePassMade = false;
   }
 
   show(){
@@ -191,6 +192,37 @@ class Box {
     this.y = mouseY;
   }
 
+  buoyancy(){
+    if(this.dy > -0.9 && this.y > 500 && this.mass/this.radius < 1){//apply buoyancy
+      this.dy = this.dy - g/60;
+    }
+    else if(this.y > 500){//slow down x axis speed in water
+      if(this.dx > 0 + 0.1){
+        this.dx = this.dx - 0.1;
+      }
+      else if(this.dx < 0 - 0.1){
+        this.dx = this.dx + 0.1;
+      }
+    }
+  }
+
+  cheapOrbitalRipoff(){
+    if(this.dx > 30 || this.dx < -30){
+      if(this.onePassMade && this.x > windowWidth && this.y > windowHeight/2 || this.x < 0 && this.y > windowHeight/2){
+        this.y = this.y - windowWidth/4;
+        this.dy = 0;
+      }
+      if(this.x < -3000){
+        this.x = windowWidth + 100;
+        this.onePassMade = true;
+      }
+      else if(this.x > windowWidth + 3000){
+        this.x = -100;
+        this.onePassMade = true;
+      }
+    }
+  }
+
   airResistance(){
     if(this.dx > 0 && this.airX !== 0){
       this.dx = this.dx - this.airX/100;
@@ -215,6 +247,7 @@ class Sphere {
     this.energyLoss = energyLoss;
     this.airX = airResistanceX;
     this.airY = airResistanceY;
+    this.onePassMade = false;
   }
 
   //displays sphere
@@ -260,6 +293,38 @@ class Sphere {
       this.dx = this.dx + this.airX/100;
     }
   }
+
+  buoyancy(){
+    if(this.dy > -0.9 && this.y > 500 && this.mass/this.radius < 1){//apply buoyancy
+      this.dy = this.dy - g/60;
+    }
+    else if(this.y > 500){//slow down x axis speed in water
+      if(this.dx > 0 + 0.1){
+        this.dx = this.dx - 0.1;
+      }
+      else if(this.dx < 0 - 0.1){
+        this.dx = this.dx + 0.1;
+      }
+    }
+  }
+
+  cheapOrbitalRipoff(){
+    if(this.dx > 30 || this.dx < -30){
+      if(this.onePassMade && this.x > windowWidth && this.y > windowHeight/2 || this.x < 0 && this.y > windowHeight/2){
+        this.y = this.y - windowWidth/4;
+        this.dy = 0;
+      }
+      if(this.x < -3000){
+        this.x = windowWidth + 100;
+        this.onePassMade = true;
+      }
+      else if(this.x > windowWidth + 3000){
+        this.x = -100;
+        this.onePassMade = true;
+      }
+    }
+  }
+
 
   //checks for collisions with other spheres
   collision(otherSphere){
@@ -438,8 +503,8 @@ function setup() {
   planet = "Earth";
   allowed = true;
   userVelocity = 0;
-  userRadius = 50;
-  userMass = 10;
+  userRadius = 35;
+  userMass = 8;
   energyLoss = 20;//for some unbeknowns't to me reason 10 seems to simulate fully elastic collisions
   airResistanceY = 0;
   airResistanceX = 0.5;
@@ -651,6 +716,7 @@ function showSurface(){
     background(0);
     fill(100,100,100,255);
     rect(0,windowHeight-30,windowWidth,30);
+    g = 1;
   }
   else if(planet === "Mars"){
     background(0);
@@ -682,8 +748,13 @@ function stateDiety(){
       objectArray[i].show();
       objectArray[i].update();
       objectArray[i].surfaceGravity();
-      objectArray[i].airResistance();
       objectArray[i].suddenChangeInAttitude();
+      if(planet === "Earth"){
+        objectArray[i].airResistance();
+      }
+      if(planet === "Moon"){
+        objectArray[i].cheapOrbitalRipoff();
+      }
       if(mouseIsPressed){
         for(let c = 0; c < objectArray.length; c++){
           if(objectArray[c].checkMouse() === true){
@@ -712,7 +783,12 @@ function stateDiety(){
       objectArray[f].show();
       objectArray[f].update();
       objectArray[f].altitudeGravity();
-      objectArray[f].airResistance();
+      if(planet === "Earth"){
+        objectArray[f].airResistance();
+      }
+      if(planet === "Moon"){
+        objectArray[f].cheapOrbitalRipoff();
+      }
       if(mouseIsPressed){
         for(let c = 0; c < objectArray.length; c++){
           if(objectArray[c].checkMouse() === true){
@@ -742,7 +818,9 @@ function stateDiety(){
       objectArray[f].show();
       objectArray[f].update();
       objectArray[f].surfaceGravity();
-      objectArray[f].airResistance();
+      if(planet === "Earth"){
+        objectArray[f].airResistance();
+      }
       objectArray[f].buoyancy();
       if(mouseIsPressed){
         for(let c = 0; c < objectArray.length; c++){
