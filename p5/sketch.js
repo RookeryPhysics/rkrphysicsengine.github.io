@@ -49,11 +49,15 @@ class Box {
   }
 
   surfaceGravity(){
-    this.dy = this.dy + this.g/50;
+    if(this.mass > 0){
+      this.dy = this.dy + this.g/50;
+    }
   }
 
   altitudeGravity(){
-    this.dy = this.dy + this.g/55;
+    if(this.mass > 0){
+      this.dy = this.dy + this.g/55;
+    }
   }
 
   suddenChangeInAttitude(){
@@ -227,12 +231,16 @@ class Sphere {
 
   //applies gravitational acceleration at surface
   surfaceGravity(){
-    this.dy = this.dy + this.g/50;
+    if(this.mass > 0){
+      this.dy = this.dy + this.g/50;
+    }
   }
 
   //high altitude gravity
   altitudeGravity(){
-    this.dy = this.dy + this.g/55;
+    if(this.mass > 0){
+      this.dy = this.dy + this.g/55;
+    }
   }
 
   //bounces ball off the surface
@@ -419,8 +427,8 @@ let leftArrow, rightArrow, upArrow, downArrow;
 function preload(){
   leftArrow = loadImage("assets/leftarrow.png");
   rightArrow = loadImage("assets/rightarrow.png");
-  //upArrow = loadImage("assets/upArrow.png");
-  //downArrow = loadImage("assets/downArrow.png");
+  upArrow = loadImage("assets/upArrow.png");
+  downArrow = loadImage("assets/downArrow.png");
 }
 
 function setup() {
@@ -451,13 +459,10 @@ function checkIfRoom(){
   }
 }
 
-image(leftArrow, 50, 350, 70, 100);
-image(rightArrow, 150, 350, 70, 100);
-
 //called when mouse is pressed
 function mousePressed(){
   checkIfRoom();
-  if(state !== "options" && mouseX < 100 && mouseY < 100){
+  if(state !== "options" && mouseX > windowWidth - 100 && mouseY < 100 ){
     state = "options";
   }
   else if(state === "options" && mouseX < 100 && mouseY < 100){
@@ -468,6 +473,18 @@ function mousePressed(){
   }
   else if(state === "options" && mouseY > 350 && mouseY < 450 && mouseX > 150 && mouseX < 220){
     userVelocity++;
+  }
+  else if(state === "options" && mouseY > 350 && mouseY < 420 && mouseX > 350 && mouseX < 450){
+    userMass++;
+  }
+  else if(state === "options" && mouseY > 450 && mouseY < 520 && mouseX > 350 && mouseX < 450){
+    userMass--;
+  }
+  else if(state === "options" && mouseY > 350 && mouseY < 420 && mouseX > 650 && mouseX < 750){
+    userRadius++;
+  }
+  else if(state === "options" && mouseY > 450 && mouseY < 520 && mouseX > 650 && mouseX < 750){
+    userRadius--;
   }
   else if(keyIsDown(49) && state === "surface" || keyIsDown(49) && state === "altitude"){
     checkIfRoom();
@@ -647,6 +664,7 @@ function showSurface(){
 function stateDiety(){
   if(state === "surface"){
     showSurface();
+    showOptionButton();
     for(let r = 0; r < staticObjectArray.length; r++){
       staticObjectArray[r].show();
       for(let e = 0; e < objectArray.length; e++){
@@ -677,6 +695,7 @@ function stateDiety(){
   }
   else if(state === "altitude"){
     background(0,255,255,255);
+    showOptionButton();
     for(let r = 0; r < staticObjectArray.length; r++){
       staticObjectArray[r].show();
       for(let e = 0; e < objectArray.length; e++){
@@ -706,6 +725,7 @@ function stateDiety(){
   else if(state === "ocean"){
     //
     background(0,255,255,255);
+    showOptionButton();
     for(let r = 0; r < staticObjectArray.length; r++){
       staticObjectArray[r].show();
       for(let e = 0; e < objectArray.length; e++){
@@ -735,6 +755,7 @@ function stateDiety(){
   }
   else if(state === "space"){
     background(0);
+    showOptionButton();
     for(let s = 0; s < staticObjectArray.length; s++){
       staticObjectArray[s].show();
     }
@@ -744,16 +765,33 @@ function stateDiety(){
   }
 }
 
+//displays the options screen
 function optionScreen(){
   background(0);
   textSize(25);
+  fill(0,220,0);
   text("Object Spawn Interface", 900, 150, 100);
   text("Obj. Velocity and Direction -/+", 100, 50, 100);
-  text("Obj. Mass", 400, 50, 100);
-  text("Obj. Size", 700, 50, 100);
+  text("Obj. Mass", 380, 50, 100);
+  text("Obj. Size", 680, 50, 100);
   text(str(userVelocity), 100, 250, 100);
-  text(str(userMass), 400, 250, 100);
-  text(str(userRadius), 700, 250, 100);
-  image(leftArrow, 50, 350, 70, 100);
-  image(rightArrow, 150, 350, 70, 100);
+  text(str(userMass), 380, 250, 100);
+  text(str(userRadius), 680, 250, 100);
+  displayArrows();
+}
+
+//shows interface arrows on options screen
+function displayArrows(){
+  image(leftArrow, 50, 350, 70, 100);//velocity
+  image(rightArrow, 150, 350, 70, 100);//velocity
+  image(upArrow, 350, 350, 100, 70);//mass
+  image(downArrow, 350, 450, 100, 70);//mass
+  image(upArrow, 650, 350, 100, 70);//size
+  image(downArrow, 650, 450, 100, 70);//size
+  image(leftArrow,0,0,100,100);//return
+}
+
+//shows the button to get to option screen
+function showOptionButton(){
+  image(rightArrow,windowWidth-100,0,100,100);
 }
