@@ -551,6 +551,24 @@ function mousePressed(){
   else if(state === "options" && mouseY > 450 && mouseY < 520 && mouseX > 650 && mouseX < 750){
     userRadius--;
   }
+  else if(state === "options" && mouseY > 650 && mouseY < 720 && mouseX > 40 && mouseX < 250){
+    location = self.location;
+  }
+  else if(state === "options" && mouseY > 650 && mouseY < 720 && mouseX > 260 && mouseX < 470){
+    planet = "Earth";
+    state = "surface";
+    g = 9.81
+  }
+  else if(state === "options" && mouseY > 650 && mouseY < 720 && mouseX > 480 && mouseX < 690){
+    state = "surface";
+    planet = "Mars";
+    g = 3;
+  }
+  else if(state === "options" && mouseY > 650 && mouseY < 720 && mouseX > 700 && mouseX < 910){
+    state = "surface";
+    planet = "Moon";
+    g = 1;
+  }
   else if(keyIsDown(49) && state === "surface" || keyIsDown(49) && state === "altitude"){
     checkIfRoom();
     if(allowed){
@@ -856,6 +874,24 @@ function optionScreen(){
   text(str(userMass), 380, 250, 100);
   text(str(userRadius), 680, 250, 100);
   displayArrows();
+  planetSelection();
+}
+
+//displays planet buttons
+function planetSelection(){
+  fill(255);
+  rect(40,650,210,70);//REFRESH
+  rect(260,650,210,70);//EARTH
+  rect(480,650,210,70);//MARS
+  rect(700,650,210,70);//MOON
+  fill(0,220,0);
+  textSize(40);
+  text("REFRESH",50,700,100);
+  text("EARTH",295,700,100);
+  fill(230,0,0);
+  text("MARS",530,700,100);
+  fill(150);
+  text("MOON",740,700,100);
 }
 
 //shows interface arrows on options screen
