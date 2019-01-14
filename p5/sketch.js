@@ -37,6 +37,7 @@ class Box {
     this.airX = airResistanceX;
     this.airY = airResistanceY;
     this.onePassMade = false;
+    this.isABox = true;
   }
 
   show(){
@@ -81,6 +82,17 @@ class Box {
     }
     else{
       return false;
+    }
+  }
+
+  boxCollide(otherBox){
+    if(dist(this.x+this.width/2,this.y+this.height/2,otherBox.x-this.width/2,otherBox.y-this.height/2) < this.width / 2 + otherBox.radius + 2){
+      if(this.isABox === true){
+        this.dx = 0;
+        this.dy = 0;
+        otherBox.dx = 0;
+        otherBox.dy = 0;
+      }
     }
   }
 
@@ -248,6 +260,7 @@ class Sphere {
     this.airX = airResistanceX;
     this.airY = airResistanceY;
     this.onePassMade = false;
+    this.isABox = false;
   }
 
   //displays sphere
@@ -321,6 +334,22 @@ class Sphere {
       else if(this.x > windowWidth + 3000){
         this.x = -100;
         this.onePassMade = true;
+      }
+    }
+  }
+
+  //only here to stop an error
+  boxCollide(otherBox){
+    if(dist(this.x+this.width/2,this.y+this.height/2,otherBox.x-this.width/2,otherBox.y-this.height/2) < this.width / 2 + otherBox.radius + 2){
+      if(this.isABox === true && otherBox.isABox === true){
+        let tempDx;
+        let tempDy;
+        tempDx = this.dy;
+        tempDy = this.dy;
+        this.dx = otherBox.dx;
+        this.dy = otherBox.dy;
+        otherBox.dx = tempDx;
+        otherBox.dy = tempDy;
       }
     }
   }
@@ -488,6 +517,7 @@ let userRadius;
 let userMass;
 let userVelocity;
 let leftArrow, rightArrow, upArrow, downArrow;
+let userShape;
 
 function preload(){
   leftArrow = loadImage("assets/leftarrow.png");
@@ -505,6 +535,7 @@ function setup() {
   userVelocity = 0;
   userRadius = 35;
   userMass = 8;
+  userShape = 1;
   energyLoss = 20;//for some unbeknowns't to me reason 10 seems to simulate fully elastic collisions
   airResistanceY = 0;
   airResistanceX = 0.5;
@@ -557,7 +588,7 @@ function mousePressed(){
   else if(state === "options" && mouseY > 650 && mouseY < 720 && mouseX > 260 && mouseX < 470){
     planet = "Earth";
     state = "surface";
-    g = 9.81
+    g = 9.81;
   }
   else if(state === "options" && mouseY > 650 && mouseY < 720 && mouseX > 480 && mouseX < 690){
     state = "surface";
@@ -639,10 +670,15 @@ function mousePressed(){
       objectArray.push(sphere);
     }
   }
-  else if(state === "surface" || state === "altitude"){
+  else if(state === "surface" || state === "altitude" || state === "ocean"){
     checkIfRoom();
     if(allowed){
-      spawnBall();
+      if(userShape === 0){
+        spawnBall();
+      }
+      else if(userShape === 1){
+        spawnBox();
+      }
     }
   }
 }
@@ -651,6 +687,12 @@ function mousePressed(){
 function spawnBall(){
   sphere = new Sphere(mouseX, mouseY, userRadius, userVelocity, 0, determineColor(), g, userMass, energyLoss, airResistanceX, airResistanceY);
   objectArray.push(sphere);
+}
+
+//creates a box
+function spawnBox(){
+  box = new Box(mouseX, mouseY, userRadius, userRadius, userVelocity, 0, determineColor(), g, userMass, energyLoss, airResistanceX, airResistanceY);
+  objectArray.push(box);
 }
 
 //remake - this is shit
@@ -691,6 +733,14 @@ function keyPressed(){
     staticObjectArray.push(wall);
     wall = new Wall(mouseX,mouseY + 100,300,10,determineColor());
     staticObjectArray.push(wall);
+  }
+  if(keyIsDown(83)){
+    if(userShape === 1){
+      userShape = 0;
+    }
+    else if(userShape === 0){
+      userShape = 1;
+    }
   }
 }
 
@@ -761,6 +811,7 @@ function stateDiety(){
         if(i !== j){
           //dont check collision against self
           objectArray[i].collision(objectArray[j]);
+          objectArray[i].boxCollide(objectArray[j]);
         }
       }
       objectArray[i].show();
