@@ -873,7 +873,7 @@ function optionsMousePress(){
 function keyPressed(){
   if(state === "surface" || state === "ocean" || state === "altitude"){
     if(keyIsDown(87)){
-      wall = new Wall(mouseX,mouseY,100,20,determineColor());
+      wall = new Wall(mouseX,mouseY,userStaticObjectWidth,userStaticObjectHeight,determineColor());
       staticObjectArray.push(wall);
     }
     else if(keyIsDown(32)){
@@ -983,7 +983,7 @@ function stateDiety(){
   else if(state === "space"){
     space();
   }
-  
+
   else if(state === "options"){
     optionScreen();
   }
