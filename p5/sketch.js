@@ -588,6 +588,7 @@ function mousePressed(){
       //creates a ball
       sphere = new Sphere(mouseX, mouseY, 25, 0, 0, determineColor(), g, 25, energyLoss, airResistanceX, airResistanceY, false);
       objectArray.push(sphere);
+      pop.play();
     }
   }
 
@@ -597,6 +598,7 @@ function mousePressed(){
       //creates a ball
       sphere = new Sphere(mouseX, mouseY, 15, -6, 0, determineColor(), g, 20, energyLoss, airResistanceX, airResistanceY, false);
       objectArray.push(sphere);
+      pop.play();
     }
   }
 
@@ -606,6 +608,7 @@ function mousePressed(){
       //creates a ball
       sphere = new Sphere(mouseX, mouseY, 15, -4, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY, false);
       objectArray.push(sphere);
+      pop.play();
     }
   }
 
@@ -615,6 +618,7 @@ function mousePressed(){
       //creates a ball
       sphere = new Sphere(mouseX, mouseY, 15, -2, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY, false);
       objectArray.push(sphere);
+      pop.play();
     }
   }
 
@@ -631,6 +635,7 @@ function mousePressed(){
       //creates a ball
       sphere = new Sphere(mouseX, mouseY, 15, 2, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY, false);
       objectArray.push(sphere);
+      pop.play();
     }
   }
 
@@ -640,6 +645,7 @@ function mousePressed(){
       //creates a ball
       sphere = new Sphere(mouseX, mouseY, 15, 4, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY, false);
       objectArray.push(sphere);
+      pop.play();
     }
   }
 
@@ -649,6 +655,7 @@ function mousePressed(){
       //creates a ball
       sphere = new Sphere(mouseX, mouseY, 15, 6, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY, false);
       objectArray.push(sphere);
+      pop.play();
     }
   }
 
@@ -658,6 +665,7 @@ function mousePressed(){
       //creates a ball
       sphere = new Sphere(mouseX, mouseY, 15, 8, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY, false);
       objectArray.push(sphere);
+      pop.play();
     }
   }
 
@@ -697,7 +705,7 @@ function explosive(){
   objectArray.push(bomb);
   bomb = new Sphere(mouseX-20,mouseY,10,-10,0,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
   objectArray.push(bomb);
-  bomb = new Sphere(mouseX,mouseY-20,10,0,-10,determineColor(),0,5,energyLoss,airResistanceX,airResistanceY,true);
+  bomb = new Sphere(mouseX,mouseY-20,10,0,-10,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
   objectArray.push(bomb);
   bomb = new Sphere(mouseX,mouseY+20,10,0,10,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
   objectArray.push(bomb);
@@ -705,7 +713,7 @@ function explosive(){
   objectArray.push(bomb);
   bomb = new Sphere(mouseX-20,mouseY-20,10,4,-7,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
   objectArray.push(bomb);
-  bomb = new Sphere(mouseX-20,mouseY-20,10,-6,-5,determineColor(),0,5,energyLoss,airResistanceX,airResistanceY,true);
+  bomb = new Sphere(mouseX-20,mouseY-20,10,-6,-5,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
   objectArray.push(bomb);
   bomb = new Sphere(mouseX-20,mouseY+20,10,-6,6,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
   objectArray.push(bomb);
@@ -1025,12 +1033,6 @@ function altitude(){
   }
 }
 
-//displays ocean water
-function displayWater(){
-  fill(0,0,255);
-  rect(0,500,windowWidth,800);
-}
-
 //runs the surface state for any planet
 function surface(){
   showSurface();
@@ -1102,6 +1104,12 @@ function ocean(){
       }
     }
   }
+}
+
+//displays ocean water
+function displayWater(){
+  fill(0,0,255);
+  rect(0,500,windowWidth,800);
 }
 
 //runs the space state
