@@ -491,6 +491,7 @@ let radius;
 let object;
 let objectArray = [];
 let staticObjectArray = [];
+let playerArray = [];
 let state;
 let planet;
 let colorState;//sets color of spawned objects
@@ -507,12 +508,22 @@ let userRadius;
 let userMass;
 let userVelocity;
 let userShape;
+let maxMass;
+let minMass;
+let maxSize;
+let minSize;
+let userStaticObjectWidth;
+let userStaticObjectHeight;
+let maxStaticWidth;
+let maxStaticHeight;
 
 let leftArrow, rightArrow, upArrow, downArrow;
 let userState;
 let time;
+let pop;
 
 function preload(){
+  pop = loadSound("assets/pop.mp3");
   leftArrow = loadImage("assets/leftarrow.png");
   rightArrow = loadImage("assets/rightarrow.png");
   upArrow = loadImage("assets/upArrow.png");
@@ -526,14 +537,23 @@ function setup() {
   planet = "Earth";
   allowed = true;
   userVelocity = 0;
-  userRadius = 35;
-  userMass = 8;
-  userShape = 1;
+  userRadius = 25;
+  userMass = 12;
+  userShape = 0;
+  maxMass = 25; //to keep things looking steady
+  minMass = -2; //just because its fun to play with negative gravity
+  maxSize = 100;
+  minSize = 10;
+  userStaticObjectWidth = 100; //same as default wall
+  userStaticObjectHeight = 20; //same as default wall
+  maxStaticWidth = 200;
+  maxStaticHeight = 200;
   //WHERE IS THE MAGIC ENERGY COMING FROM?
   energyLoss = 20;//for some unbeknowns't to me reason 10 seems to simulate fully elastic collisions
   airResistanceY = 0;
   airResistanceX = 0.5;
   createCanvas(windowWidth, windowHeight);
+  alert("CLICK!");
 }
 
 //checks if there is room to add a ball where the mouse is
@@ -555,6 +575,7 @@ function mousePressed(){
   if(state !== "options" && mouseX > windowWidth - 100 && mouseY < 100 ){
     userState = state;
     state = "options";
+    pop.play();
   }
 
   else if(state === "options"){
@@ -657,12 +678,14 @@ function mousePressed(){
 function spawnBall(){
   sphere = new Sphere(mouseX, mouseY, userRadius, userVelocity, 0, determineColor(), g, userMass, energyLoss, airResistanceX, airResistanceY, false);
   objectArray.push(sphere);
+  pop.play();
 }
 
 //creates a box
 function spawnBox(){
   box = new Box(mouseX, mouseY, userRadius, userRadius, userVelocity, 0, determineColor(), g, userMass, energyLoss, airResistanceX, airResistanceY);
   objectArray.push(box);
+  pop.play();
 }
 
 //remake - this is shit
@@ -687,37 +710,52 @@ function explosive(){
   bomb = new Sphere(mouseX-20,mouseY+20,10,-6,6,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
   objectArray.push(bomb);
   colorState = tempState;//puts colorState back to normal
-  time = new Timer(10000);
+  pop.play();
 }
 
 //mouse press options on options screen
 function optionsMousePress(){
   if(mouseX < 100 && mouseY < 100){
     state = userState;
+    pop.play();
   }
 
   else if(mouseX < 120 && mouseX > 50 && mouseY > 350 && mouseY < 450){
     userVelocity--;
+    pop.play();
   }
 
   else if(mouseY > 350 && mouseY < 450 && mouseX > 150 && mouseX < 220){
     userVelocity++;
+    pop.play();
   }
 
   else if(mouseY > 350 && mouseY < 420 && mouseX > 350 && mouseX < 450){
-    userMass++;
+    if(userMass < maxMass){
+      userMass++;
+    }
+    pop.play();
   }
 
   else if(mouseY > 450 && mouseY < 520 && mouseX > 350 && mouseX < 450){
-    userMass--;
+    if(userMass > minMass){
+      userMass--;
+    }
+    pop.play();
   }
 
   else if(mouseY > 350 && mouseY < 420 && mouseX > 650 && mouseX < 750){
-    userRadius++;
+    if(userRadius < maxSize){
+      userRadius++;
+    }
+    pop.play();
   }
 
   else if(mouseY > 450 && mouseY < 520 && mouseX > 650 && mouseX < 750){
-    userRadius--;
+    if(userRadius > minSize){
+      userRadius--;
+    }
+    pop.play();
   }
 
   else if(mouseY > 650 && mouseY < 720 && mouseX > 40 && mouseX < 250){
@@ -728,92 +766,127 @@ function optionsMousePress(){
     planet = "Earth";
     state = "surface";
     g = 9.81;
+    pop.play();
   }
 
   else if(mouseY > 650 && mouseY < 720 && mouseX > 480 && mouseX < 690){
     state = "surface";
     planet = "Mars";
     g = 3;
+    pop.play();
   }
 
   else if(mouseY > 650 && mouseY < 720 && mouseX > 700 && mouseX < 910){
     state = "surface";
     planet = "Moon";
     g = 1;
+    pop.play();
   }
 
   else if(mouseY > 730 && mouseY < 800 && mouseX > 260 && mouseX < 470){
     planet = "Earth";
     state = "ocean";
+    pop.play();
   }
 
   else if(mouseY > 570 && mouseY < 650 && mouseX > 260 && mouseX < 470){
     planet = "Earth";
     state = "altitude";
+    pop.play();
   }
-  // fill(100,100,100,255);
-  // rect(850,100,50,50);
-  // fill(255);
-  // rect(850,160,50,50);
-  // fill(255,0,0,255);
-  // rect(850,220,50,50);
-  // fill(0,255,0,255);
-  // rect(850,280,50,50);
-  // fill(0,0,255,255);
-  // rect(850,340,50,50);
-  // fill(0);
-  // rect(850,400,50,50);
-  // fill(220,220,0,255);
-  // rect(850,460,50,50);
-  // fill(220,0,220,255);
-  // rect(850,520,50,50);
-  // fill(0,220,220,255);
-  // rect(850,580,50,50);
+
   else if(mouseX > 850 && mouseX < 900 && mouseY > 100 && mouseY < 150){
     colorState = 0;
+    pop.play();
   }
+
   else if(mouseX > 850 && mouseX < 900 && mouseY > 160 && mouseY < 210){
     colorState = 1;
+    pop.play();
   }
+
   else if(mouseX > 850 && mouseX < 900 && mouseY > 220 && mouseY < 270){
     colorState = 2;
+    pop.play();
   }
-  else if(mouseX > 850 && mouseY < 900 && mouseY > 280 && mouseY < 330){
+
+  else if(mouseX > 850 && mouseX < 900 && mouseY > 280 && mouseY < 330){
     colorState = 3;
+    pop.play();
   }
-  else if(mouseX > 850 && mouseY < 900 && mouseY > 340 && mouseY < 390){
+
+  else if(mouseX > 850 && mouseX < 900 && mouseY > 340 && mouseY < 390){
     colorState = 4;
+    pop.play();
   }
+
   else if(mouseX > 850 && mouseX < 900 & mouseY > 400 && mouseY < 450){
     colorState = 5;
+    pop.play();
   }
+
   else if(mouseX > 850 && mouseX < 900 && mouseY > 460 && mouseY < 510){
     colorState = 6;
+    pop.play();
   }
+
   else if(mouseX > 850 && mouseX < 900 && mouseY > 520 && mouseY < 570){
     colorState = 7;
+    pop.play();
   }
+
   else if(mouseX > 850 && mouseX < 900 && mouseY > 580 && mouseY < 630){
     colorState = 8;
+    pop.play();
+  }
+
+  else if(mouseX > 1300 && mouseX < 1380 && mouseY > 300 && mouseY < 350){
+    if(userStaticObjectWidth < maxStaticWidth){
+      userStaticObjectWidth++;
+      pop.play();
+    }
+  }
+
+  else if(mouseX > 1300 && mouseX < 1380 && mouseY > 360 && mouseY < 410){
+    if(userStaticObjectWidth > 0){
+      userStaticObjectWidth--;
+      pop.play();
+    }
+  }
+
+  else if(mouseX > 1470 && mouseX < 1550 && mouseY > 300 && mouseY < 350){
+    if(userStaticObjectHeight < maxStaticHeight){
+      userStaticObjectHeight++;
+      pop.play();
+    }
+  }
+
+  else if(mouseX > 1470 && mouseX < 1550 && mouseY > 360 && mouseY < 410){
+    if(userStaticObjectHeight > 0){
+      userStaticObjectHeight--;
+      pop.play();
+    }
   }
 }
 
 //called when key pressed
 function keyPressed(){
-  if(keyIsDown(87)){
-    wall = new Wall(mouseX,mouseY,100,20,determineColor());
-    staticObjectArray.push(wall);
+  if(state === "surface" || state === "ocean" || state === "altitude"){
+    if(keyIsDown(87)){
+      wall = new Wall(mouseX,mouseY,100,20,determineColor());
+      staticObjectArray.push(wall);
+    }
+    else if(keyIsDown(32)){
+      explosive();
+    }
+    else if(keyIsDown(84)){
+      wall = new Wall(mouseX,mouseY,300,10,determineColor());
+      staticObjectArray.push(wall);
+      wall = new Wall(mouseX,mouseY + 100,300,10,determineColor());
+      staticObjectArray.push(wall);
+    }
   }
-  else if(keyIsDown(32)){
-    explosive();
-  }
-  else if(keyIsDown(84)){
-    wall = new Wall(mouseX,mouseY,300,10,determineColor());
-    staticObjectArray.push(wall);
-    wall = new Wall(mouseX,mouseY + 100,300,10,determineColor());
-    staticObjectArray.push(wall);
-  }
-  else if(keyIsDown(83)){
+  if(keyIsDown(83)){
     if(userShape === 1){
       userShape = 0;
     }
@@ -828,30 +901,39 @@ function determineColor(){
   if(colorState === 0){
     return color(100,100,100,255);//grey
   }
+
   else if(colorState === 1){
     return color(255);//white
   }
+
   else if(colorState === 2){
     return color(255,0,0,255);//red
   }
+
   else if(colorState === 3){
     return color(0,255,0,255);//green
   }
+
   else if(colorState === 4){
     return color(0,0,255,255);//blue
   }
+
   else if(colorState === 5){
     return color(0);//black
   }
+
   else if(colorState === 6){
     return color(220,220,0,255);//yellow
   }
+
   else if(colorState === 7){
     return color(220,0,220,255);//pink
   }
+
   else if(colorState === 8){
     return color(0,220,220,255);//cyan
   }
+
   else{
     return color(100,100,100,255);//makes the game grey if user tries to mess with the color state variable
   }
@@ -868,12 +950,14 @@ function showSurface(){
     fill(0,200,0);
     rect(0,windowHeight-30,windowWidth,30);
   }
+
   else if(planet === "Moon"){
     background(0);
     fill(100,100,100,255);
     rect(0,windowHeight-30,windowWidth,30);
     g = 1;
   }
+
   else if(planet === "Mars"){
     background(0);
     fill(255,0,0,255);
@@ -887,15 +971,19 @@ function stateDiety(){
   if(state === "surface"){
     surface();
   }
+
   else if(state === "altitude"){
     altitude();
   }
+
   else if(state === "ocean"){
     ocean();
   }
+
   else if(state === "space"){
     space();
   }
+  
   else if(state === "options"){
     optionScreen();
   }
@@ -941,25 +1029,6 @@ function altitude(){
 function displayWater(){
   fill(0,0,255);
   rect(0,500,windowWidth,800);
-}
-
-//displays the options screen
-function optionScreen(){
-  noStroke();
-  background(0);
-  textSize(25);
-  fill(0,220,0);
-  text("Object Spawn Interface", 1000, 150, 100);
-  text("Obj. Velocity and Direction -/+", 100, 50, 100);
-  text("Obj. Mass", 380, 50, 100);
-  text("Obj. Size", 680, 50, 100);
-  text("Color", 845, 60, 100);
-  text(str(userVelocity), 100, 250, 100);
-  text(str(userMass), 380, 250, 100);
-  text(str(userRadius), 680, 250, 100);
-  displayArrows();
-  planetSelection();
-  colorSelection();
 }
 
 //runs the surface state for any planet
@@ -1044,6 +1113,33 @@ function space(){
   }
 }
 
+//displays the options screen
+function optionScreen(){
+  noStroke();
+  background(0);
+  fill(0,220,0);
+  textSize(30);
+  text("<-Object-> <-Spawn-> <-Interface->", 950, 100, 100);
+  textSize(25);
+  text("Obj. Velocity and Direction -/+", 100, 50, 100);
+  text("Obj. Mass", 380, 50, 100);
+  text("Obj. Size", 680, 50, 100);
+  text("Color", 845, 60, 100);
+  text("S Key Toggles Square/Sphere",950,350,100);
+  text("W Key Places Static Obj.",950,550,100);
+  text("Additional-> Static-> Obj.-> Options-> | | | | | | vvvvvv",1150,200,100);
+  text("Static Obj. Width",1300,50,100);
+  text("Static Obj. Height",1470,50,100);
+  text(str(userVelocity), 100, 250, 100);
+  text(str(userMass), 380, 250, 100);
+  text(str(userRadius), 680, 250, 100);
+  text(str(userStaticObjectWidth), 1310, 250, 100);
+  text(str(userStaticObjectHeight), 1490, 250, 100);
+  displayArrows();
+  planetSelection();
+  colorSelection();
+}
+
 //displays planet buttons
 function planetSelection(){
   fill(255);
@@ -1068,6 +1164,7 @@ function planetSelection(){
   text("ALTITUDE",270,620,100);
 }
 
+//displays color selection bar in options screen
 function colorSelection(){
   strokeWeight(4);
   stroke(255);
@@ -1102,6 +1199,10 @@ function displayArrows(){
   image(upArrow, 650, 350, 100, 70);//size
   image(downArrow, 650, 450, 100, 70);//size
   image(leftArrow,0,0,100,100);//return
+  image(upArrow,1300,300,80,50);//static width
+  image(downArrow,1300,360,80,50);//static width
+  image(upArrow,1470,300,80,50);//static height
+  image(downArrow,1470,360,80,50);//static height
 }
 
 //shows the button to get to option screen
