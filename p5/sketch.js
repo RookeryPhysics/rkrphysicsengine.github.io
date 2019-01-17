@@ -41,6 +41,8 @@ class Box {
     this.airY = airResistanceY;
     this.onePassMade = false;
     this.isABox = true;
+    this.snapDx = false;
+    this.snapDy = false;
   }
 
   show(){
@@ -201,12 +203,21 @@ class Box {
       this.dy = this.dy - g/30;
     }
     else if(this.y > 500){//slow down x axis speed in water
+      this.snapDx = this.dx;
+      this.snapDy = this.dy;
       if(this.dx > 0.1){
         this.dx = this.dx - 0.1;
       }
       else if(this.dx < -0.1){
         this.dx = this.dx + 0.1;
       }
+    }
+  }
+
+  pendulate(){
+    if(this.dx < 1 && this.dx > -1 && this.y < 500 && this.snapDx !== false){
+      this.dx = this.snapDx * -1;
+      this.dy = this.snapDy;
     }
   }
 
@@ -254,6 +265,8 @@ class Sphere {
     this.onePassMade = false;
     this.isABox = false;
     this.explosive = explosive;
+    this.snapDx = false;
+    this.snapDy = false;
   }
 
   //displays sphere
@@ -305,12 +318,21 @@ class Sphere {
       this.dy = this.dy - g/30;
     }
     else if(this.y > 500){//slow down x axis speed in water
+      this.snapDx = this.dx;
+      this.snapDy = this.dy;
       if(this.dx > 0.1){
         this.dx = this.dx - 0.1;
       }
       else if(this.dx < -0.1){
         this.dx = this.dx + 0.1;
       }
+    }
+  }
+
+  pendulate(){
+    if(this.dx < 1 && this.dx > -1 && this.y < 500 && this.snapDx !== false){
+      this.dx = this.snapDx * -1;
+      this.dy = this.snapDy;
     }
   }
 
@@ -995,6 +1017,10 @@ function stateDiety(){
   else if(state === "options"){
     optionScreen();
   }
+
+  else if(state === "demo"){
+    pendulumSham();
+  }
 }
 
 //runs altitude state
@@ -1061,6 +1087,40 @@ function surface(){
     if(planet === "Moon"){
       objectArray[i].cheapOrbitalRipoff();
     }
+    if(mouseIsPressed){
+      for(let c = 0; c < objectArray.length; c++){
+        if(objectArray[c].checkMouse() === true){
+          objectArray[c].dragObject();
+        }
+      }
+    }
+  }
+}
+
+function pendulumSham(){
+  background(0,255,255,255);
+  showOptionButton();
+  for(let r = 0; r < staticObjectArray.length; r++){
+    staticObjectArray[r].show();
+    for(let e = 0; e < objectArray.length; e++){
+      objectArray[e].wallCollision(staticObjectArray[r]);
+    }
+  }
+  for(let f = objectArray.length - 1; f >= 0; f--){
+    objectArray[f].isCollide = false;
+    for(let k = objectArray.length - 1; k >= 0; k--){
+      if(f !== k){
+        objectArray[f].collision(objectArray[k]);
+      }
+    }
+    objectArray[f].show();
+    objectArray[f].update();
+    objectArray[f].surfaceGravity();
+    if(planet === "Earth"){
+      objectArray[f].airResistance();
+    }
+    objectArray[f].buoyancy();
+    objectArray[f].pendulate();
     if(mouseIsPressed){
       for(let c = 0; c < objectArray.length; c++){
         if(objectArray[c].checkMouse() === true){
