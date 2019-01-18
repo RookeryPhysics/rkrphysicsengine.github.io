@@ -346,6 +346,7 @@ class Sphere {
     }
   }
 
+  //makes things float on water
   buoyancy(){
     if(this.y > 460 && !this.snaped){
       this.snapDx = this.dx;
@@ -367,6 +368,7 @@ class Sphere {
     }
   }
 
+  //modified buoyancy function for use in simulating pendulum
   pendulumLift(){
     if(this.y > 460 && !this.snaped){
       this.snapDx = this.dx;
@@ -603,6 +605,7 @@ let userStaticObjectWidth;
 let userStaticObjectHeight;
 let maxStaticWidth;
 let maxStaticHeight;
+let pendulumBallSpawned;
 
 let leftArrow, rightArrow, upArrow, downArrow;
 let userState;
@@ -635,6 +638,7 @@ function setup() {
   userStaticObjectHeight = 20; //same as default wall
   maxStaticWidth = 200;
   maxStaticHeight = 200;
+  pendulumBallSpawned = false;
   //WHERE IS THE MAGIC ENERGY COMING FROM?
   energyLoss = 20;//for some unbeknowns't to me reason 10 seems to simulate fully elastic collisions
   airResistanceY = 0;
@@ -669,7 +673,7 @@ function mousePressed(){
     optionsMousePress();
   }
 
-  else if(keyIsDown(49) && state === "surface" || keyIsDown(49) && state === "altitude" || keyIsDown(49) && state === "ocean" || keyIsDown(49) && state === "demo"){
+  else if(keyIsDown(49) && state === "surface" || keyIsDown(49) && state === "altitude" || keyIsDown(49) && state === "ocean"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -679,7 +683,7 @@ function mousePressed(){
     }
   }
 
-  else if(keyIsDown(50) && state === "surface" || keyIsDown(50) && state === "altitude" || keyIsDown(50) && state === "ocean" || keyIsDown(50) && state === "demo"){
+  else if(keyIsDown(50) && state === "surface" || keyIsDown(50) && state === "altitude" || keyIsDown(50) && state === "ocean"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -689,7 +693,7 @@ function mousePressed(){
     }
   }
 
-  else if(keyIsDown(51) && state === "surface" || keyIsDown(51) && state === "altitude" || keyIsDown(51) && state === "ocean" || keyIsDown(51) && state === "demo"){
+  else if(keyIsDown(51) && state === "surface" || keyIsDown(51) && state === "altitude" || keyIsDown(51) && state === "ocean"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -699,7 +703,7 @@ function mousePressed(){
     }
   }
 
-  else if(keyIsDown(52) && state === "surface" || keyIsDown(52) && state === "altitude" || keyIsDown(52) && state === "ocean" || keyIsDown(52) && state === "demo"){
+  else if(keyIsDown(52) && state === "surface" || keyIsDown(52) && state === "altitude" || keyIsDown(52) && state === "ocean"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -709,14 +713,14 @@ function mousePressed(){
     }
   }
 
-  else if(keyIsDown(53) && state === "surface" || keyIsDown(53) && state === "altitude" || keyIsDown(53) && state === "ocean" || keyIsDown(53) && state === "demo"){
+  else if(keyIsDown(53) && state === "surface" || keyIsDown(53) && state === "altitude" || keyIsDown(53) && state === "ocean"){
     checkIfRoom();
     if(allowed){
       spawnBall();
     }
   }
 
-  else if(keyIsDown(54) && state === "surface" || keyIsDown(54) && state === "altitude" || keyIsDown(54) && state === "ocean" || keyIsDown(54) && state === "demo"){
+  else if(keyIsDown(54) && state === "surface" || keyIsDown(54) && state === "altitude" || keyIsDown(54) && state === "ocean"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -726,7 +730,7 @@ function mousePressed(){
     }
   }
 
-  else if(keyIsDown(55) && state === "surface" || keyIsDown(55) && state === "altitude" || keyIsDown(55) && state === "ocean" || keyIsDown(55) && state === "demo"){
+  else if(keyIsDown(55) && state === "surface" || keyIsDown(55) && state === "altitude" || keyIsDown(55) && state === "ocean"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -736,7 +740,7 @@ function mousePressed(){
     }
   }
 
-  else if(keyIsDown(56) && state === "surface" || keyIsDown(56) && state === "altitude" || keyIsDown(56) && state === "ocean" || keyIsDown(56) && state === "demo"){
+  else if(keyIsDown(56) && state === "surface" || keyIsDown(56) && state === "altitude" || keyIsDown(56) && state === "ocean"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -746,7 +750,7 @@ function mousePressed(){
     }
   }
 
-  else if(keyIsDown(57) && state === "surface" || keyIsDown(57) && state === "altitude" || keyIsDown(57) && state === "ocean" || keyIsDown(57) && state === "demo"){
+  else if(keyIsDown(57) && state === "surface" || keyIsDown(57) && state === "altitude" || keyIsDown(57) && state === "ocean"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -756,7 +760,7 @@ function mousePressed(){
     }
   }
 
-  else if(state === "surface" || state === "altitude" || state === "ocean" || state === "demo"){
+  else if(state === "surface" || state === "altitude" || state === "ocean"){
     checkIfRoom();
     if(allowed){
       if(userShape === 0){
@@ -1166,6 +1170,11 @@ function pendulumSham(){
   background(0,255,255,255);
   //displayWater();
   showOptionButton();
+  if(!pendulumBallSpawned){
+    sphere = new Sphere(300, 380, 35, 8, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY, false);
+    objectArray.push(sphere);
+    pendulumBallSpawned = true;
+  }
   for(let r = 0; r < staticObjectArray.length; r++){
     staticObjectArray[r].show();
     for(let e = 0; e < objectArray.length; e++){
@@ -1282,7 +1291,7 @@ function planetSelection(){
   rect(480,650,210,70);//MARS
   rect(700,650,210,70);//MOON
   rect(260,730,210,70);//ocean
-  rect(260,570,210,70)//altitude
+  rect(260,570,210,70);//altitude
   fill(150,100,0);
   textSize(40);
   text("REFRESH",50,700,100);
