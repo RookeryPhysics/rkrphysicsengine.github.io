@@ -23,7 +23,7 @@ class Wall{
   }
 }
 
-class Box {
+class Block {
   constructor(x,y,width,height,dx,dy,color,g,mass,energyLoss,airResistanceX,airResistanceY){
     this.x = x;
     this.y = y;
@@ -572,6 +572,12 @@ class Timer {
   }
 }
 
+//TO DO:
+//create a way to access the pendulum demo
+//make the pendulum demo better?
+//create the planet builder Interface
+//code in the calculation for gravitational acceleration based on planet mass and radius and bigG
+
 let sphere;
 let wall;
 let ballColor;
@@ -608,9 +614,12 @@ let maxStaticHeight;
 let pendulumBallSpawned;
 
 let leftArrow, rightArrow, upArrow, downArrow;
-let userState;
+let customizationState;
 let time;
 let pop;
+
+//gravitational constant (G)
+const bigG = 0.0000000000667384;
 
 function preload(){
   pop = loadSound("assets/pop.mp3");
@@ -620,16 +629,22 @@ function preload(){
   downArrow = loadImage("assets/downArrow.png");
 }
 
+//SEE WHAT IS
+//SEE WHAT ISNT
+//FOLLOW THE TRUE WAY
+
 function setup() {
+  time = new Timer(100);
   g = 9.81;
   colorState = 0;
-  state = "demo";
+  state = "surface";
   planet = "Earth";
   allowed = true;
   userVelocity = 0;
   userRadius = 25;
   userMass = 12;
   userShape = 0;
+  customizationState = 0;
   maxMass = 25; //to keep things looking steady
   minMass = -2; //just because its fun to play with negative gravity
   maxSize = 100;
@@ -677,7 +692,7 @@ function mousePressed(){
     checkIfRoom();
     if(allowed){
       //creates a ball
-      sphere = new Sphere(mouseX, mouseY, -8, 0, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY, false);
+      sphere = new Sphere(mouseX, mouseY, 15, -8, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY, false);
       objectArray.push(sphere);
       pop.play();
     }
@@ -761,13 +776,15 @@ function mousePressed(){
   }
 
   else if(state === "surface" || state === "altitude" || state === "ocean"){
-    checkIfRoom();
-    if(allowed){
-      if(userShape === 0){
-        spawnBall();
-      }
-      else if(userShape === 1){
-        spawnBox();
+    if(time.isDone() === true){
+      checkIfRoom();
+      if(allowed){
+        if(userShape === 0){
+          spawnBall();
+        }
+        else if(userShape === 1){
+          spawnBox();
+        }
       }
     }
   }
@@ -782,7 +799,7 @@ function spawnBall(){
 
 //creates a box
 function spawnBox(){
-  box = new Box(mouseX, mouseY, userRadius, userRadius, userVelocity, 0, determineColor(), g, userMass, energyLoss, airResistanceX, airResistanceY);
+  box = new Block(mouseX, mouseY, userRadius, userRadius, userVelocity, 0, determineColor(), g, userMass, energyLoss, airResistanceX, airResistanceY);
   objectArray.push(box);
   pop.play();
 }
@@ -975,7 +992,7 @@ function keyPressed(){
       wall = new Wall(mouseX,mouseY,userStaticObjectWidth,userStaticObjectHeight,determineColor());
       staticObjectArray.push(wall);
     }
-    else if(keyIsDown(32)){
+    else if(keyIsDown(32) && state !== "demo"){
       explosive();
     }
     else if(keyIsDown(84)){
@@ -1090,6 +1107,10 @@ function stateDiety(){
   else if(state === "demo"){
     pendulumSham();
   }
+
+  else if(state === "custom"){
+    customizePlanet();
+  }
 }
 
 //runs altitude state
@@ -1171,7 +1192,7 @@ function pendulumSham(){
   //displayWater();
   showOptionButton();
   if(!pendulumBallSpawned){
-    sphere = new Sphere(300, 380, 35, 8, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY, false);
+    sphere = new Sphere(300, 400, 35, 7, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY, false);
     objectArray.push(sphere);
     pendulumBallSpawned = true;
   }
@@ -1350,5 +1371,57 @@ function displayArrows(){
 
 //shows the button to get to option screen
 function showOptionButton(){
-  image(rightArrow,windowWidth-100,0,100,100);
+  image(rightArrow,windowWidth-                100,0,100,100);
+}
+
+//runs user through the planet customization GUI
+function customizePlanet(){
+  if(customizationState === 0){//progress through customizations states
+    setColor();
+  }
+  else if(customizationState === 1){//optional option A
+    setMass();
+  }
+  else if(customizationState === 2){//optional option A
+    setRadius();
+  }
+  else if(customizationState === 3){//optional option B
+    setGravity();
+  }
+  //run the black hole determine function here
+  //if it is true bring user to a black hole error page
+}
+
+//sets the planet color(just shows the normal color bar)
+//also sets background/sky color
+function setColor(){
+  //
+}
+
+//sets the planet mass(to help determine gravitational acceleration)
+function setMass(){
+  //
+}
+
+//sets the radius of planet(to help determine gravitational acceleration)
+function setRadius(){
+  //
+}
+
+//this option will be accessed if the user doesn't want to set their own planet mass and radius
+function setGravity(){
+  //
+}
+
+//calculate the gravitational acceleration of the custom planet based on the gravitational constant, the radius, and the mass
+function calculateLittleG(){
+  let littleG;
+  //math here
+  return littleG;
+}
+
+//checks if the created planet would form a black hole
+function seeIfBlackHole(){
+  //do math here
+  //return if black hole
 }
