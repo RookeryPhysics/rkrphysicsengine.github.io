@@ -43,6 +43,8 @@ class Box {
     this.isABox = true;
     this.snapDx = false;
     this.snapDy = false;
+    this.hasHit = false;
+    this.snaped = false;
   }
 
   show(){
@@ -199,12 +201,18 @@ class Box {
   }
 
   buoyancy(){
-    if(this.dy > -0.9 && this.y > 500 && this.mass/this.radius < 1){//apply buoyancy
-      this.dy = this.dy - g/30;
-    }
-    else if(this.y > 500){//slow down x axis speed in water
+    //this is for the pendumlumSham
+    if(this.y > 460 && !this.snaped){
       this.snapDx = this.dx;
       this.snapDy = this.dy;
+      this.snaped = true;
+    }
+    if(this.dy > -0.9 && this.y > 500 && this.mass/this.radius < 1){//apply buoyancy
+      this.dy = this.dy - g/30;
+      this.hasHit = true;//this is for the pendulumSham to determine if object has hit the level where it should pendulate
+    }
+    if(this.y > 500){//slow down x axis speed in water
+      this.hasHit = true;
       if(this.dx > 0.1){
         this.dx = this.dx - 0.1;
       }
@@ -214,10 +222,33 @@ class Box {
     }
   }
 
+  pendulumLift(){
+    if(this.y > 460 && !this.snaped){
+      this.snapDx = this.dx;
+      this.snapDy = this.dy;
+      this.snaped = true;
+    }
+    if(this.dy > -3 && this.y > 500 && this.mass/this.radius < 1){//apply buoyancy
+      this.dy = this.dy - g/30;
+      this.hasHit = true;
+    }
+    if(this.y > 500){//slow down x axis speed in water
+      this.hasHit = true;
+      if(this.dx > 0.1){
+        this.dx = this.dx - 0.07;
+      }
+      else if(this.dx < -0.1){
+        this.dx = this.dx + 0.07;
+      }
+    }
+  }
+
+  //sadly doesnt work
   pendulate(){
-    if(this.dx < 1 && this.dx > -1 && this.y < 500 && this.snapDx !== false){
+    if(this.dx < 1 && this.dx > -1 && this.y < 500 && this.y > 460 && this.hasHit){
       this.dx = this.snapDx * -1;
       this.dy = this.snapDy;
+      this.snapDx = this.snapDx * -1;
     }
   }
 
@@ -267,6 +298,8 @@ class Sphere {
     this.explosive = explosive;
     this.snapDx = false;
     this.snapDy = false;
+    this.hasHit = false;
+    this.snaped = false;
   }
 
   //displays sphere
@@ -314,12 +347,17 @@ class Sphere {
   }
 
   buoyancy(){
-    if(this.dy > -0.9 && this.y > 500 && this.mass/this.radius < 1){//apply buoyancy
-      this.dy = this.dy - g/30;
-    }
-    else if(this.y > 500){//slow down x axis speed in water
+    if(this.y > 460 && !this.snaped){
       this.snapDx = this.dx;
       this.snapDy = this.dy;
+      this.snaped = true;
+    }
+    if(this.dy > -0.9 && this.y > 500 && this.mass/this.radius < 1){//apply buoyancy
+      this.dy = this.dy - g/30;
+      this.hasHit = true;
+    }
+    if(this.y > 500){//slow down x axis speed in water
+      this.hasHit = true;
       if(this.dx > 0.1){
         this.dx = this.dx - 0.1;
       }
@@ -329,13 +367,40 @@ class Sphere {
     }
   }
 
-  pendulate(){
-    if(this.dx < 1 && this.dx > -1 && this.y < 500 && this.snapDx !== false){
-      this.dx = this.snapDx * -1;
-      this.dy = this.snapDy;
+  pendulumLift(){
+    if(this.y > 460 && !this.snaped){
+      this.snapDx = this.dx;
+      this.snapDy = this.dy;
+      this.snaped = true;
+    }
+    if(this.dy > -3 && this.y > 500 && this.mass/this.radius < 1){//apply buoyancy
+      this.dy = this.dy - g/30;
+      this.hasHit = true;
+    }
+    if(this.y > 500){//slow down x axis speed in water
+      this.hasHit = true;
+      if(this.dx > 0.1){
+        this.dx = this.dx - 0.07;
+      }
+      else if(this.dx < -0.1){
+        this.dx = this.dx + 0.07;
+      }
     }
   }
 
+
+  //basically the only thing that doesn't work for 2 reasons:
+  //-its hard to get the snapDx and snapDy for the object before it hits the water(I would need a way to know it was about to hit the water)
+  //-the other reason is the difficulty of knowing when it is at the end of the cycle as observed in the below if statement conditionals
+  pendulate(){
+    if(this.dx < 1 && this.dx > -1 && this.y < 500 && this.y > 460 && this.hasHit){
+      this.dx = this.snapDx * -1;
+      this.dy = this.snapDy;
+      this.snapDx = this.snapDx * -1;
+    }
+  }
+
+  //makes objects orbit the moon
   cheapOrbitalRipoff(){
     if(this.dx > 30 || this.dx < -30){
       if(this.onePassMade && this.x > windowWidth && this.y > windowHeight/2 || this.x < 0 && this.y > windowHeight/2){
@@ -555,7 +620,7 @@ function preload(){
 function setup() {
   g = 9.81;
   colorState = 0;
-  state = "surface";
+  state = "demo";
   planet = "Earth";
   allowed = true;
   userVelocity = 0;
@@ -604,27 +669,27 @@ function mousePressed(){
     optionsMousePress();
   }
 
-  else if(keyIsDown(49) && state === "surface" || keyIsDown(49) && state === "altitude" || keyIsDown(49) && state === "ocean"){
+  else if(keyIsDown(49) && state === "surface" || keyIsDown(49) && state === "altitude" || keyIsDown(49) && state === "ocean" || keyIsDown(49) && state === "demo"){
     checkIfRoom();
     if(allowed){
       //creates a ball
-      sphere = new Sphere(mouseX, mouseY, 25, 0, 0, determineColor(), g, 25, energyLoss, airResistanceX, airResistanceY, false);
+      sphere = new Sphere(mouseX, mouseY, -8, 0, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY, false);
       objectArray.push(sphere);
       pop.play();
     }
   }
 
-  else if(keyIsDown(50) && state === "surface" || keyIsDown(50) && state === "altitude" || keyIsDown(50) && state === "ocean"){
+  else if(keyIsDown(50) && state === "surface" || keyIsDown(50) && state === "altitude" || keyIsDown(50) && state === "ocean" || keyIsDown(50) && state === "demo"){
     checkIfRoom();
     if(allowed){
       //creates a ball
-      sphere = new Sphere(mouseX, mouseY, 15, -6, 0, determineColor(), g, 20, energyLoss, airResistanceX, airResistanceY, false);
+      sphere = new Sphere(mouseX, mouseY, 15, -6, 0, determineColor(), g, 10, energyLoss, airResistanceX, airResistanceY, false);
       objectArray.push(sphere);
       pop.play();
     }
   }
 
-  else if(keyIsDown(51) && state === "surface" || keyIsDown(51) && state === "altitude" || keyIsDown(51) && state === "ocean"){
+  else if(keyIsDown(51) && state === "surface" || keyIsDown(51) && state === "altitude" || keyIsDown(51) && state === "ocean" || keyIsDown(51) && state === "demo"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -634,7 +699,7 @@ function mousePressed(){
     }
   }
 
-  else if(keyIsDown(52) && state === "surface" || keyIsDown(52) && state === "altitude" || keyIsDown(52) && state === "ocean"){
+  else if(keyIsDown(52) && state === "surface" || keyIsDown(52) && state === "altitude" || keyIsDown(52) && state === "ocean" || keyIsDown(52) && state === "demo"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -644,14 +709,14 @@ function mousePressed(){
     }
   }
 
-  else if(keyIsDown(53) && state === "surface" || keyIsDown(53) && state === "altitude" || keyIsDown(53) && state === "ocean"){
+  else if(keyIsDown(53) && state === "surface" || keyIsDown(53) && state === "altitude" || keyIsDown(53) && state === "ocean" || keyIsDown(53) && state === "demo"){
     checkIfRoom();
     if(allowed){
       spawnBall();
     }
   }
 
-  else if(keyIsDown(54) && state === "surface" || keyIsDown(54) && state === "altitude" || keyIsDown(54) && state === "ocean"){
+  else if(keyIsDown(54) && state === "surface" || keyIsDown(54) && state === "altitude" || keyIsDown(54) && state === "ocean" || keyIsDown(54) && state === "demo"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -661,7 +726,7 @@ function mousePressed(){
     }
   }
 
-  else if(keyIsDown(55) && state === "surface" || keyIsDown(55) && state === "altitude" || keyIsDown(55) && state === "ocean"){
+  else if(keyIsDown(55) && state === "surface" || keyIsDown(55) && state === "altitude" || keyIsDown(55) && state === "ocean" || keyIsDown(55) && state === "demo"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -671,7 +736,7 @@ function mousePressed(){
     }
   }
 
-  else if(keyIsDown(56) && state === "surface" || keyIsDown(56) && state === "altitude" || keyIsDown(56) && state === "ocean"){
+  else if(keyIsDown(56) && state === "surface" || keyIsDown(56) && state === "altitude" || keyIsDown(56) && state === "ocean" || keyIsDown(56) && state === "demo"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -681,7 +746,7 @@ function mousePressed(){
     }
   }
 
-  else if(keyIsDown(57) && state === "surface" || keyIsDown(57) && state === "altitude" || keyIsDown(57) && state === "ocean"){
+  else if(keyIsDown(57) && state === "surface" || keyIsDown(57) && state === "altitude" || keyIsDown(57) && state === "ocean" || keyIsDown(57) && state === "demo"){
     checkIfRoom();
     if(allowed){
       //creates a ball
@@ -691,7 +756,7 @@ function mousePressed(){
     }
   }
 
-  else if(state === "surface" || state === "altitude" || state === "ocean"){
+  else if(state === "surface" || state === "altitude" || state === "ocean" || state === "demo"){
     checkIfRoom();
     if(allowed){
       if(userShape === 0){
@@ -901,7 +966,7 @@ function optionsMousePress(){
 
 //called when key pressed
 function keyPressed(){
-  if(state === "surface" || state === "ocean" || state === "altitude"){
+  if(state === "surface" || state === "ocean" || state === "altitude" || state === "demo"){
     if(keyIsDown(87)){
       wall = new Wall(mouseX,mouseY,userStaticObjectWidth,userStaticObjectHeight,determineColor());
       staticObjectArray.push(wall);
@@ -1099,6 +1164,7 @@ function surface(){
 
 function pendulumSham(){
   background(0,255,255,255);
+  //displayWater();
   showOptionButton();
   for(let r = 0; r < staticObjectArray.length; r++){
     staticObjectArray[r].show();
@@ -1119,7 +1185,7 @@ function pendulumSham(){
     if(planet === "Earth"){
       objectArray[f].airResistance();
     }
-    objectArray[f].buoyancy();
+    objectArray[f].pendulumLift();
     objectArray[f].pendulate();
     if(mouseIsPressed){
       for(let c = 0; c < objectArray.length; c++){
