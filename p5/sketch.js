@@ -243,7 +243,6 @@ class Block {
     }
   }
 
-  //sadly doesnt work
   pendulate(){
     if(this.dx < 1 && this.dx > -1 && this.y < 500 && this.y > 460 && this.hasHit){
       this.dx = this.snapDx * -1;
@@ -296,10 +295,10 @@ class Sphere {
     this.onePassMade = false;
     this.isABox = false;
     this.explosive = explosive;
-    this.snapDx = false;
-    this.snapDy = false;
-    this.hasHit = false;
-    this.snaped = false;
+    this.snapDx = false;//for pendulum demo
+    this.snapDy = false;//
+    this.hasHit = false;//
+    this.snaped = false;//
   }
 
   //displays sphere
@@ -580,9 +579,7 @@ class Timer {
 
 let sphere;
 let wall;
-let ballColor;
 let g;//gravitational acceleration
-let radius;
 let object;
 let objectArray = [];
 let staticObjectArray = [];
