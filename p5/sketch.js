@@ -47,28 +47,33 @@ class Block {
     this.snaped = false;
   }
 
+  //displays
   show(){
     fill(this.color);
     rect(this.x,this.y,this.width,this.height);
   }
 
+  //updates position based on velocity
   update(){
     this.x = this.x + this.dx;
     this.y = this.y + this.dy;
   }
 
+  //applies gravity
   surfaceGravity(){
     if(this.mass > 0){
       this.dy = this.dy + this.g/50;
     }
   }
 
+  //applies gravity at height
   altitudeGravity(){
     if(this.mass > 0){
       this.dy = this.dy + this.g/55;
     }
   }
 
+  //bounce
   suddenChangeInAttitude(){
     if(this.y > windowHeight - 30 - this.height){
       this.y = windowHeight - 30 - this.height;
@@ -83,6 +88,7 @@ class Block {
     }
   }
 
+  //check if object there
   checkMouse(){
     if(mouseX > this.x && mouseX < this.x + this.width && mouseY < this.y + this.height && mouseY > this.y){
       return true;
@@ -92,6 +98,7 @@ class Block {
     }
   }
 
+  //obj collision
   collision(otherSphere){
     if(dist(this.x+this.width/2,this.y+this.height/2,otherSphere.x,otherSphere.y) < this.width / 2 + otherSphere.radius + 2){//add two so not as many balls get stuck in eachother
       let massRatioOther = this.mass/otherSphere.mass;
@@ -195,13 +202,14 @@ class Block {
     }
   }
 
+  //drag object with mouse
   dragObject(){
     this.x = mouseX;
     this.y = mouseY;
   }
 
+  //float
   buoyancy(){
-    //this is for the pendumlumSham
     if(this.y > 460 && !this.snaped){
       this.snapDx = this.dx;
       this.snapDy = this.dy;
@@ -222,6 +230,7 @@ class Block {
     }
   }
 
+  //for pendulum demo
   pendulumLift(){
     if(this.y > 460 && !this.snaped){
       this.snapDx = this.dx;
@@ -243,6 +252,7 @@ class Block {
     }
   }
 
+  //for pendulum demo
   pendulate(){
     if(this.dx < 1 && this.dx > -1 && this.y < 500 && this.y > 460 && this.hasHit){
       this.dx = this.snapDx * -1;
@@ -251,6 +261,7 @@ class Block {
     }
   }
 
+  //makes objects orbit
   cheapOrbitalRipoff(){
     if(this.dx > 30 || this.dx < -30){
       if(this.onePassMade && this.x > windowWidth && this.y > windowHeight/2 || this.x < 0 && this.y > windowHeight/2){
@@ -268,6 +279,7 @@ class Block {
     }
   }
 
+  //air resistance
   airResistance(){
     if(this.dx > 0 && this.airX !== 0){
       this.dx = this.dx - this.airX/100;
@@ -336,6 +348,7 @@ class Sphere {
     }
   }
 
+  //slows objects going through air
   airResistance(){
     if(this.dx > 0 && this.airX !== 0){
       this.dx = this.dx - this.airX/100;
@@ -389,10 +402,7 @@ class Sphere {
     }
   }
 
-
-  //basically the only thing that doesn't work for 2 reasons:
-  //-its hard to get the snapDx and snapDy for the object before it hits the water(I would need a way to know it was about to hit the water)
-  //-the other reason is the difficulty of knowing when it is at the end of the cycle as observed in the below if statement conditionals
+  //for pendulum demo
   pendulate(){
     if(this.dx < 1 && this.dx > -1 && this.y < 500 && this.y > 460 && this.hasHit){
       this.dx = this.snapDx * -1;
@@ -499,6 +509,7 @@ class Sphere {
     }
   }
 
+  //sees if mouse is over object
   checkMouse(){
     if(mouseX > this.x - this.radius  && mouseX < this.x + this.radius && mouseY < this.y + this.radius && mouseY > this.y - this.radius){
       return true;
@@ -508,6 +519,7 @@ class Sphere {
     }
   }
 
+  //carries object
   dragObject(){
     this.x = mouseX;
     this.y = mouseY;
@@ -585,6 +597,7 @@ let objectArray = [];
 let staticObjectArray = [];
 let playerArray = [];
 let state;
+let userState;
 let planet;
 let colorState;//sets color of spawned objects
 let energyLoss;
@@ -785,45 +798,62 @@ function mousePressed(){
       }
     }
   }
-}
 
-//creates a ball
-function spawnBall(){
-  sphere = new Sphere(mouseX, mouseY, userRadius, userVelocity, 0, determineColor(), g, userMass, energyLoss, airResistanceX, airResistanceY, false);
-  objectArray.push(sphere);
-  pop.play();
-}
+  else if(state === "custom" && customizationState === 0){
+    if(mouseX > 850 && mouseX < 900 && mouseY > 100 && mouseY < 150){
+      colorState = 0;
+      pop.play();
+      customizationState++;
+    }
 
-//creates a box
-function spawnBox(){
-  box = new Block(mouseX, mouseY, userRadius, userRadius, userVelocity, 0, determineColor(), g, userMass, energyLoss, airResistanceX, airResistanceY);
-  objectArray.push(box);
-  pop.play();
-}
+    else if(mouseX > 850 && mouseX < 900 && mouseY > 160 && mouseY < 210){
+      colorState = 1;
+      pop.play();
+      customizationState++;
+    }
 
-//remake - this is shit
-function explosive(){
-  let bomb;
-  let tempState = colorState;//sets tempState to colorState to store value
-  colorState = 2; //makes explosion red
-  bomb = new Sphere(mouseX+20,mouseY,10,10,0,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
-  objectArray.push(bomb);
-  bomb = new Sphere(mouseX-20,mouseY,10,-10,0,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
-  objectArray.push(bomb);
-  bomb = new Sphere(mouseX,mouseY-20,10,0,-10,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
-  objectArray.push(bomb);
-  bomb = new Sphere(mouseX,mouseY+20,10,0,10,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
-  objectArray.push(bomb);
-  bomb = new Sphere(mouseX+20,mouseY+20,10,6,7,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
-  objectArray.push(bomb);
-  bomb = new Sphere(mouseX-20,mouseY-20,10,4,-7,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
-  objectArray.push(bomb);
-  bomb = new Sphere(mouseX-20,mouseY-20,10,-6,-5,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
-  objectArray.push(bomb);
-  bomb = new Sphere(mouseX-20,mouseY+20,10,-6,6,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
-  objectArray.push(bomb);
-  colorState = tempState;//puts colorState back to normal
-  pop.play();
+    else if(mouseX > 850 && mouseX < 900 && mouseY > 220 && mouseY < 270){
+      colorState = 2;
+      pop.play();
+      customizationState++;
+    }
+
+    else if(mouseX > 850 && mouseX < 900 && mouseY > 280 && mouseY < 330){
+      colorState = 3;
+      pop.play();
+      customizationState++;
+    }
+
+    else if(mouseX > 850 && mouseX < 900 && mouseY > 340 && mouseY < 390){
+      colorState = 4;
+      pop.play();
+      customizationState++;
+    }
+
+    else if(mouseX > 850 && mouseX < 900 & mouseY > 400 && mouseY < 450){
+      colorState = 5;
+      pop.play();
+      customizationState++;
+    }
+
+    else if(mouseX > 850 && mouseX < 900 && mouseY > 460 && mouseY < 510){
+      colorState = 6;
+      pop.play();
+      customizationState++;
+    }
+
+    else if(mouseX > 850 && mouseX < 900 && mouseY > 520 && mouseY < 570){
+      colorState = 7;
+      pop.play();
+      customizationState++;
+    }
+
+    else if(mouseX > 850 && mouseX < 900 && mouseY > 580 && mouseY < 630){
+      colorState = 8;
+      pop.play();
+      customizationState++;
+    }
+  }
 }
 
 //mouse press options on options screen
@@ -1009,6 +1039,50 @@ function keyPressed(){
   }
 }
 
+//creates a ball
+function spawnBall(){
+  sphere = new Sphere(mouseX, mouseY, userRadius, userVelocity, 0, determineColor(), g, userMass, energyLoss, airResistanceX, airResistanceY, false);
+  objectArray.push(sphere);
+  pop.play();
+}
+
+//creates a box
+function spawnBox(){
+  box = new Block(mouseX, mouseY, userRadius, userRadius, userVelocity, 0, determineColor(), g, userMass, energyLoss, airResistanceX, airResistanceY);
+  objectArray.push(box);
+  pop.play();
+}
+
+//executes divine plan
+function draw() {
+  stateDiety();
+}
+
+//blows things up
+function explosive(){
+  let bomb;
+  let tempState = colorState;//sets tempState to colorState to store value
+  colorState = 2; //makes explosion red
+  bomb = new Sphere(mouseX+20,mouseY,10,10,0,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
+  objectArray.push(bomb);
+  bomb = new Sphere(mouseX-20,mouseY,10,-10,0,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
+  objectArray.push(bomb);
+  bomb = new Sphere(mouseX,mouseY-20,10,0,-10,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
+  objectArray.push(bomb);
+  bomb = new Sphere(mouseX,mouseY+20,10,0,10,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
+  objectArray.push(bomb);
+  bomb = new Sphere(mouseX+20,mouseY+20,10,6,7,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
+  objectArray.push(bomb);
+  bomb = new Sphere(mouseX-20,mouseY-20,10,4,-7,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
+  objectArray.push(bomb);
+  bomb = new Sphere(mouseX-20,mouseY-20,10,-6,-5,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
+  objectArray.push(bomb);
+  bomb = new Sphere(mouseX-20,mouseY+20,10,-6,6,determineColor(),g,5,energyLoss,airResistanceX,airResistanceY,true);
+  objectArray.push(bomb);
+  colorState = tempState;//puts colorState back to normal
+  pop.play();
+}
+
 //determines object color based off of variable
 function determineColor(){
   if(colorState === 0){
@@ -1050,10 +1124,6 @@ function determineColor(){
   else{
     return color(100,100,100,255);//makes the game grey if user tries to mess with the color state variable
   }
-}
-
-function draw() {
-  stateDiety();
 }
 
 //displays the surface
@@ -1368,8 +1438,10 @@ function displayArrows(){
 
 //shows the button to get to option screen
 function showOptionButton(){
-  image(rightArrow,windowWidth-                100,0,100,100);
+  image(rightArrow,windowWidth-100,0,100,100);
 }
+
+//the following code is incomplete and is included as an expression of the endless goal that this project is
 
 //runs user through the planet customization GUI
 function customizePlanet(){
@@ -1392,12 +1464,18 @@ function customizePlanet(){
 //sets the planet color(just shows the normal color bar)
 //also sets background/sky color
 function setColor(){
-  //
+  background(0);
+  textSize(35);
+  text("Pick Planet Color",200,400);
+  colorSelection();
 }
 
 //sets the planet mass(to help determine gravitational acceleration)
 function setMass(){
-  //
+  background(0);
+  textSize(35);
+  text("Set Planet Mass",200,400);
+  //code here to let user set mass
 }
 
 //sets the radius of planet(to help determine gravitational acceleration)
